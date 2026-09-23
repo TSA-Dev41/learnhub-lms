@@ -5,8 +5,13 @@ const {
   getCourseById,
   getCategories,
 } = require("../controllers/courseController");
+const { getLessonsForCourse } = require("../controllers/lessonController");
+const { enrollInCourse } = require("../controllers/enrollmentController");
+const { protect } = require("../middleware/authMiddleware");
 
 router.get("/categories", getCategories);
+router.get("/:id/lessons", getLessonsForCourse);
+router.post("/:id/enroll", protect, enrollInCourse);
 router.get("/:id", getCourseById);
 router.get("/", getCourses);
 

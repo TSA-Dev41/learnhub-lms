@@ -5,6 +5,9 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const adminCourseRoutes = require("./routes/adminCourseRoutes");
+const enrollmentRoutes = require("./routes/enrollmentRoutes");
+const lessonRoutes = require("./routes/lessonRoutes");
+const adminLessonRoutes = require("./routes/adminLessonRoutes");
 
 connectDB();
 
@@ -20,5 +23,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/admin/courses", adminCourseRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/lessons", lessonRoutes);
+app.use("/api/admin/lessons", adminLessonRoutes);
 
 module.exports = app;
