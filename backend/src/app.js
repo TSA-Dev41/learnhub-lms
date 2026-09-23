@@ -1,6 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+const courseRoutes = require("./routes/courseRoutes");
+const adminCourseRoutes = require("./routes/adminCourseRoutes");
+const enrollmentRoutes = require("./routes/enrollmentRoutes");
+const lessonRoutes = require("./routes/lessonRoutes");
+const adminLessonRoutes = require("./routes/adminLessonRoutes");
+
+connectDB();
 
 const app = express();
 
@@ -10,5 +19,12 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "LearnHub API is running", data: null });
 });
+
+app.use("/api/auth", authRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/admin/courses", adminCourseRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/lessons", lessonRoutes);
+app.use("/api/admin/lessons", adminLessonRoutes);
 
 module.exports = app;
