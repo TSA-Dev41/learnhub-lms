@@ -15,6 +15,11 @@ export default function Navbar() {
         </Link>
         {user ? (
           <>
+            {user.role === "admin" && (
+              <Link to="/admin" className="text-gray-700 hover:text-blue-600">
+                Admin Panel
+              </Link>
+            )}
             <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
               Dashboard
             </Link>
@@ -26,6 +31,7 @@ export default function Navbar() {
             </button>
           </>
         ) : (
+          
           <>
             <Link to="/login" className="text-gray-700 hover:text-blue-600">
               Login

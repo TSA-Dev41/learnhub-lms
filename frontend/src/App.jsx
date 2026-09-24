@@ -9,6 +9,9 @@ import CourseDetails from "./pages/CourseDetails";
 import Lesson from "./pages/Lesson";
 import Quiz from "./pages/Quiz";
 import QuizResult from "./pages/QuizResult";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminOverview from "./pages/admin/AdminOverview";
 
 function App() {
   return (
@@ -52,6 +55,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminOverview />} />
+        </Route>
       </Routes>
     </>
   );
