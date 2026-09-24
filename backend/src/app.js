@@ -11,6 +11,7 @@ const adminLessonRoutes = require("./routes/adminLessonRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const adminQuizRoutes = require("./routes/adminQuizRoutes");
 const adminQuestionRoutes = require("./routes/adminQuestionRoutes");
+const progressRoutes = require("./routes/progressRoutes");
 
 connectDB();
 
@@ -32,5 +33,5 @@ app.use("/api/admin/lessons", adminLessonRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/admin/quizzes", adminQuizRoutes);
 app.use("/api/admin/questions", adminQuestionRoutes);
-
+app.use("/api/progress", progressRoutes);
 module.exports = app;
