@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Catalogue from "./pages/Catalogue";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CourseDetails from "./pages/CourseDetails";
+import Lesson from "./pages/Lesson";
 
 function App() {
   return (
@@ -25,6 +26,14 @@ function App() {
         <Route path="/courses" element={<Catalogue />} />
         <Route path="/courses/:id" element={<CourseDetails />} />
         <Route path="/" element={<Catalogue />} />
+        <Route
+          path="/lessons/:id"
+          element={
+            <ProtectedRoute>
+              <Lesson />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

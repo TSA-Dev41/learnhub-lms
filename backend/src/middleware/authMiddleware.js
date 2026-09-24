@@ -53,3 +53,18 @@ exports.authorize = (...roles) => {
     next();
   };
 };
+
+// Attaches req.user if a valid token is present, but doesn't block if missing/invalid
+exports.optionalAuth = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer")) {
+    const token = authHeader.split(" ")[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id);
+    } catch (error) {
+      // invalid/expired token — just proceed without req.user
+    }
+  }
+  next();
+};
