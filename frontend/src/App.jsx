@@ -7,6 +7,8 @@ import Catalogue from "./pages/Catalogue";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CourseDetails from "./pages/CourseDetails";
 import Lesson from "./pages/Lesson";
+import Quiz from "./pages/Quiz";
+import QuizResult from "./pages/QuizResult";
 
 function App() {
   return (
@@ -31,6 +33,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Lesson />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes/:id"
+          element={
+            <ProtectedRoute>
+              <Quiz />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes/:id/result"
+          element={
+            <ProtectedRoute>
+              <QuizResult />
             </ProtectedRoute>
           }
         />
