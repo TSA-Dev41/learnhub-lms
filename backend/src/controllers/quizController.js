@@ -33,7 +33,7 @@ exports.getQuizById = async (req, res) => {
     }
 
     const questions = await Question.find({ quiz: quiz._id }).select(
-      "text options" // explicitly exclude correctAnswer
+      "text options"
     );
 
     res.status(200).json({
@@ -61,10 +61,33 @@ exports.getQuizById = async (req, res) => {
   }
 };
 
+// @route  GET /api/courses/:id/quizzes
+// Public list (titles only) — actual quiz content still requires enrollment via getQuizById
+exports.getQuizzesForCourse = async (req, res) => {
+  try {
+    const quizzes = await Quiz.find({
+      course: req.params.id,
+      status: "published",
+    }).select("title description passingScore");
+
+    res.status(200).json({
+      success: true,
+      message: "Quizzes retrieved successfully",
+      data: quizzes,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to load quizzes for this course. Please try again.",
+      data: null,
+    });
+  }
+};
+
 // @route  POST /api/quizzes/:id/submit
 exports.submitQuiz = async (req, res) => {
   try {
-    const { answers } = req.body; // [{ questionId, selectedOption }]
+    const { answers } = req.body;
 
     if (!Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({

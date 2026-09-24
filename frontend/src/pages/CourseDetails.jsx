@@ -8,19 +8,25 @@ export default function CourseDetails() {
   const { user } = useAuth();
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState(false);
   const [enrollMessage, setEnrollMessage] = useState("");
 
   useEffect(() => {
+    setLoading(true);
+    setError("");
+
     Promise.all([
       api.get(`/courses/${id}`),
       api.get(`/courses/${id}/lessons`),
+      api.get(`/courses/${id}/quizzes`),
     ])
-      .then(([courseRes, lessonsRes]) => {
+      .then(([courseRes, lessonsRes, quizzesRes]) => {
         setCourse(courseRes.data.data);
         setLessons(lessonsRes.data.data);
+        setQuizzes(quizzesRes.data.data);
       })
       .catch(() => setError("Unable to load this course. Please try again."))
       .finally(() => setLoading(false));
@@ -124,6 +130,40 @@ export default function CourseDetails() {
           </li>
         ))}
       </ul>
+
+      {/* Quizzes */}
+      {quizzes.length > 0 && (
+        <>
+          <h2 className="text-xl font-bold mt-8 mb-3">Quizzes</h2>
+          <ul className="space-y-2">
+            {quizzes.map((quiz) => (
+              <li
+                key={quiz._id}
+                className="bg-white border rounded p-3 flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-medium">{quiz.title}</p>
+                  <p className="text-sm text-gray-500">
+                    Passing score: {quiz.passingScore}%
+                  </p>
+                </div>
+                {isEnrolled ? (
+                  <Link
+                    to={`/quizzes/${quiz._id}`}
+                    className="text-blue-600 text-sm hover:underline"
+                  >
+                    Take Quiz
+                  </Link>
+                ) : (
+                  <span className="text-gray-400 text-sm">
+                    🔒 Enroll to unlock
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
