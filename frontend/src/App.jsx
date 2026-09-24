@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Catalogue from "./pages/Catalogue";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CourseDetails from "./pages/CourseDetails";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           }
         />
         <Route path="/courses" element={<Catalogue />} />
+        <Route path="/courses/:id" element={<CourseDetails />} />
         <Route path="/" element={<Catalogue />} />
       </Routes>
     </>
