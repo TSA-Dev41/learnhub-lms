@@ -42,6 +42,26 @@ exports.getLessonsForCourse = async (req, res) => {
   }
 };
 
+// @route  GET /api/admin/lessons/course/:courseId
+// Admin only — full lesson list for a course, regardless of published status
+exports.getLessonsForCourseAdmin = async (req, res) => {
+  try {
+    const lessons = await Lesson.find({ course: req.params.courseId }).sort({ order: 1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Lessons retrieved successfully",
+      data: lessons,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to load lessons. Please try again.",
+      data: null,
+    });
+  }
+};
+
 // @route  GET /api/lessons/:id
 // Requires enrollment (via requireEnrollment middleware, sets req.lesson)
 exports.getLessonById = async (req, res) => {

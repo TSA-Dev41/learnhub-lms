@@ -15,6 +15,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import ManageCourses from "./pages/admin/ManageCourses";
 import CreateCourse from "./pages/admin/CreateCourse";
 import EditCourse from "./pages/admin/EditCourse";
+import ManageLessons from "./pages/admin/ManageLessons";
 
 function App() {
   return (
@@ -70,6 +71,7 @@ function App() {
           <Route path="courses" element={<ManageCourses />} />
           <Route path="courses/new" element={<CreateCourse />} />
           <Route path="courses/:id/edit" element={<EditCourse />} />
+          <Route path="courses/:id/lessons" element={<ManageLessons />} />
         </Route>
       </Routes>
     </>
