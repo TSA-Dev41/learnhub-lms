@@ -9,14 +9,12 @@ export default function ManageCourses() {
 
   const fetchCourses = () => {
     setLoading(true);
-    // Admin needs to see draft courses too, so we fetch a wider net.
-    // Since /api/courses only returns published, we'll fetch each status separately
-    // and merge — simplest fix without adding a new admin-specific list endpoint.
-    Promise.all([
-      api.get("/courses", { params: { limit: 100 } }),
-    ])
-      .then(([publishedRes]) => {
-        setCourses(publishedRes.data.data);
+    // Admin sees ALL statuses via the dedicated admin endpoint —
+    // no more merging published-only results.
+    api
+      .get("/admin/courses", { params: { limit: 100 } })
+      .then((res) => {
+        setCourses(res.data.data);
       })
       .catch(() => setError("Unable to load courses. Please try again."))
       .finally(() => setLoading(false));

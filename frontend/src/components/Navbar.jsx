@@ -18,6 +18,11 @@ export default function Navbar() {
             <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
               Dashboard
             </Link>
+            {user.role === "admin" && (
+              <Link to="/admin" className="text-gray-700 hover:text-blue-600">
+                Admin Panel
+              </Link>
+            )}
             <button
               onClick={logout}
               className="bg-gray-200 px-3 py-1.5 rounded hover:bg-gray-300 text-sm"

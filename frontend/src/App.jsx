@@ -5,10 +5,14 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Catalogue from "./pages/Catalogue";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import CourseDetails from "./pages/CourseDetails";
 import Lesson from "./pages/Lesson";
 import Quiz from "./pages/Quiz";
 import QuizResult from "./pages/QuizResult";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminOverview from "./pages/admin/AdminOverview";
+import ManageCourses from "./pages/admin/ManageCourses";
 
 function App() {
   return (
@@ -52,6 +56,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminOverview />} />
+          <Route path="courses" element={<ManageCourses />} />
+        </Route>
       </Routes>
     </>
   );
