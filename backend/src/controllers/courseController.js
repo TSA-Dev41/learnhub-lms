@@ -37,6 +37,38 @@ exports.getCourses = async (req, res) => {
   }
 };
 
+// @route  GET /api/admin/courses
+// Admin only — returns ALL courses regardless of status
+exports.getAllCoursesAdmin = async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [courses, total] = await Promise.all([
+      Course.find({}).skip(skip).limit(Number(limit)).sort({ createdAt: -1 }),
+      Course.countDocuments({}),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Courses retrieved successfully",
+      data: courses,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / Number(limit)),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to load courses. Please try again.",
+      data: null,
+    });
+  }
+};
+
 // @route  GET /api/courses/:id
 // Public
 exports.getCourseById = async (req, res) => {

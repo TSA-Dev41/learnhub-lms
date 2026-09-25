@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  getAllCoursesAdmin,
   createCourse,
   updateCourse,
   deleteCourse,
@@ -10,6 +11,7 @@ const { protect, authorize } = require("../middleware/authMiddleware");
 
 router.use(protect, authorize("admin"));
 
+router.get("/", getAllCoursesAdmin);
 router.post("/", createCourse);
 router.put("/:id", updateCourse);
 router.delete("/:id", deleteCourse);
