@@ -97,6 +97,21 @@ exports.getCourseById = async (req, res) => {
   }
 };
 
+// @desc    Get single course by ID (admin - any status)
+// @route   GET /api/admin/courses/:id
+// @access  Private/Admin
+exports.getCourseByIdAdmin = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    res.json({ success: true, data: course });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 // @route  GET /api/courses/categories
 // Public
 exports.getCategories = async (req, res) => {

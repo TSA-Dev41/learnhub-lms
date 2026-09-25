@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOverview from "./pages/admin/AdminOverview";
 import ManageCourses from "./pages/admin/ManageCourses";
 import CreateCourse from "./pages/admin/CreateCourse";
+import EditCourse from "./pages/admin/EditCourse";
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
           <Route index element={<AdminOverview />} />
           <Route path="courses" element={<ManageCourses />} />
           <Route path="courses/new" element={<CreateCourse />} />
+          <Route path="courses/:id/edit" element={<EditCourse />} />
         </Route>
       </Routes>
     </>
