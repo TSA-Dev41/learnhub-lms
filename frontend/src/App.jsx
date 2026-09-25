@@ -13,6 +13,7 @@ import QuizResult from "./pages/QuizResult";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOverview from "./pages/admin/AdminOverview";
 import ManageCourses from "./pages/admin/ManageCourses";
+import CreateCourse from "./pages/admin/CreateCourse";
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
         >
           <Route index element={<AdminOverview />} />
           <Route path="courses" element={<ManageCourses />} />
+          <Route path="courses/new" element={<CreateCourse />} />
         </Route>
       </Routes>
     </>
