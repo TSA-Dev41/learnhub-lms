@@ -7,21 +7,49 @@ export default function ManageCourses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchCourses = () => {
-    setLoading(true);
-    // Admin sees ALL statuses via the dedicated admin endpoint —
-    // no more merging published-only results.
-    api
-      .get("/admin/courses", { params: { limit: 100 } })
-      .then((res) => {
-        setCourses(res.data.data);
-      })
-      .catch(() => setError("Unable to load courses. Please try again."))
-      .finally(() => setLoading(false));
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      // Admin sees ALL statuses via the dedicated admin endpoint —
+      // no more merging published-only results.
+      const res = await api.get("/admin/courses", { params: { limit: 100 } });
+      setCourses(res.data.data);
+      setError("");
+    } catch {
+      setError("Unable to load courses. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchCourses();
+    let ignore = false;
+
+    const loadCourses = async () => {
+      if (ignore) return;
+      try {
+        setLoading(true);
+        const res = await api.get("/admin/courses", { params: { limit: 100 } });
+        if (!ignore) {
+          setCourses(res.data.data);
+          setError("");
+        }
+      } catch {
+        if (!ignore) {
+          setError("Unable to load courses. Please try again.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadCourses();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleStatusChange = async (id, status) => {

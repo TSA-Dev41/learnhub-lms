@@ -15,9 +15,6 @@ export default function CourseDetails() {
   const [enrollMessage, setEnrollMessage] = useState("");
 
   useEffect(() => {
-    setLoading(true);
-    setError("");
-
     Promise.all([
       api.get(`/courses/${id}`),
       api.get(`/courses/${id}/lessons`),
@@ -56,6 +53,11 @@ export default function CourseDetails() {
   }
 
   if (!course) return null;
+
+  const loadedCourseId = course._id ?? course.id;
+  if (String(loadedCourseId) !== String(id)) {
+    return <p className="p-8 text-gray-500">Loading course...</p>;
+  }
 
   const isEnrolled = lessons.some((l) => l.hasAccess);
 
