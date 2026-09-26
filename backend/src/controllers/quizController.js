@@ -212,6 +212,72 @@ exports.getQuizResult = async (req, res) => {
   }
 };
 
+// @route  GET /api/admin/quizzes/course/:courseId
+// Admin only — all quizzes for a course, regardless of status
+exports.getQuizzesForCourseAdmin = async (req, res) => {
+  try {
+    const quizzes = await Quiz.find({ course: req.params.courseId }).select(
+      "title description passingScore timeLimit status"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Quizzes retrieved successfully",
+      data: quizzes,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to load quizzes for this course. Please try again.",
+      data: null,
+    });
+  }
+};
+
+// @route  GET /api/admin/quizzes/:id
+// Admin only — full quiz + questions including correctAnswer, regardless of status
+exports.getQuizByIdAdmin = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: "Quiz not found",
+        data: null,
+      });
+    }
+
+    const questions = await Question.find({ quiz: quiz._id });
+
+    res.status(200).json({
+      success: true,
+      message: "Quiz retrieved successfully",
+      data: {
+        id: quiz._id,
+        title: quiz.title,
+        description: quiz.description,
+        passingScore: quiz.passingScore,
+        timeLimit: quiz.timeLimit,
+        status: quiz.status,
+        questions: questions.map((q) => ({
+          id: q._id,
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          points: q.points,
+        })),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to load this quiz. Please try again.",
+      data: null,
+    });
+  }
+};
+
 // ---- ADMIN ----
 
 // @route  POST /api/admin/quizzes
