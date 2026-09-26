@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../../services/api";
 
 export default function StudentDetail() {
@@ -31,24 +32,40 @@ export default function StudentDetail() {
 
   useEffect(() => {
     const timeoutId = setTimeout(fetchStudentDetail, 0);
-
     return () => clearTimeout(timeoutId);
   }, [fetchStudentDetail]);
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) {
+    return (
+      <div>
+        <div className="h-4 w-32 rounded skeleton mb-4" />
+        <div className="h-8 w-1/3 rounded skeleton mb-2" />
+        <div className="h-4 w-1/4 rounded skeleton mb-6" />
+        <div className="h-40 w-full rounded-lg skeleton mb-8" />
+        <div className="h-40 w-full rounded-lg skeleton" />
+      </div>
+    );
+  }
 
   if (error) {
     return (
       <div>
-        <p className="bg-red-100 text-red-700 p-3 rounded mb-3">{error}</p>
+        <p className="mb-3" style={{ color: "var(--color-danger)" }}>
+          {error}
+        </p>
         <div className="flex items-center gap-4">
           <button
             onClick={fetchStudentDetail}
-            className="text-sm font-medium text-blue-600 underline"
+            className="text-sm font-medium underline"
+            style={{ color: "var(--color-primary)" }}
           >
             Retry
           </button>
-          <Link to="/admin/students" className="text-blue-600 hover:underline text-sm">
+          <Link
+            to="/admin/students"
+            className="hover:underline text-sm"
+            style={{ color: "var(--color-primary)" }}
+          >
             ← Back to Students
           </Link>
         </div>
@@ -57,38 +74,56 @@ export default function StudentDetail() {
   }
 
   return (
-    <div>
-      <Link to="/admin/students" className="text-blue-600 hover:underline text-sm">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Link
+        to="/admin/students"
+        className="hover:underline text-sm"
+        style={{ color: "var(--color-primary)" }}
+      >
         ← Back to Students
       </Link>
 
-      <h1 className="text-2xl font-bold mt-2 mb-1">{student.name}</h1>
-      <p className="text-gray-500 mb-6">{student.email}</p>
+      <h1 className="text-2xl font-bold mt-2 mb-1" style={{ color: "var(--color-text)" }}>
+        {student.name}
+      </h1>
+      <p className="mb-6" style={{ color: "var(--color-text-muted)" }}>
+        {student.email}
+      </p>
 
       {/* Enrollments */}
-      <h2 className="text-lg font-bold mb-3">Enrollments</h2>
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+      <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
+        Enrollments
+      </h2>
+      <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-3">Course</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Enrolled</th>
+          <thead style={{ background: "var(--color-primary-light)" }}>
+            <tr className="text-left">
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Course</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Status</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Enrolled</th>
             </tr>
           </thead>
           <tbody>
             {enrollments.map((e) => (
-              <tr key={e.enrollmentId} className="border-t">
-                <td className="p-3 font-medium">{e.courseTitle}</td>
-                <td className="p-3 capitalize">{e.status}</td>
-                <td className="p-3">
+              <tr key={e.enrollmentId} className="border-t border-gray-100">
+                <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                  {e.courseTitle}
+                </td>
+                <td className="p-3 capitalize" style={{ color: "var(--color-text-muted)" }}>
+                  {e.status}
+                </td>
+                <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
                   {new Date(e.enrolledAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {enrollments.length === 0 && (
               <tr>
-                <td colSpan="3" className="p-6 text-center text-gray-500">
+                <td colSpan="3" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
                   Not enrolled in any courses.
                 </td>
               </tr>
@@ -98,29 +133,35 @@ export default function StudentDetail() {
       </div>
 
       {/* Lesson progress */}
-      <h2 className="text-lg font-bold mb-3">Completed Lessons</h2>
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+      <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
+        Completed Lessons
+      </h2>
+      <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-3">Lesson</th>
-              <th className="p-3">Course</th>
-              <th className="p-3">Completed</th>
+          <thead style={{ background: "var(--color-primary-light)" }}>
+            <tr className="text-left">
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Lesson</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Course</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Completed</th>
             </tr>
           </thead>
           <tbody>
             {progress.lessons.map((l, i) => (
-              <tr key={i} className="border-t">
-                <td className="p-3 font-medium">{l.lessonTitle}</td>
-                <td className="p-3">{l.courseTitle}</td>
-                <td className="p-3">
+              <tr key={i} className="border-t border-gray-100">
+                <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                  {l.lessonTitle}
+                </td>
+                <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
+                  {l.courseTitle}
+                </td>
+                <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
                   {new Date(l.completedAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {progress.lessons.length === 0 && (
               <tr>
-                <td colSpan="3" className="p-6 text-center text-gray-500">
+                <td colSpan="3" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
                   No lessons completed yet.
                 </td>
               </tr>
@@ -130,41 +171,48 @@ export default function StudentDetail() {
       </div>
 
       {/* Quiz attempts */}
-      <h2 className="text-lg font-bold mb-3">Quiz Attempts</h2>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
+        Quiz Attempts
+      </h2>
+      <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-3">Quiz</th>
-              <th className="p-3">Score</th>
-              <th className="p-3">Result</th>
-              <th className="p-3">Date</th>
+          <thead style={{ background: "var(--color-primary-light)" }}>
+            <tr className="text-left">
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Quiz</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Score</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Result</th>
+              <th className="p-3" style={{ color: "var(--color-text)" }}>Date</th>
             </tr>
           </thead>
           <tbody>
             {progress.quizzes.map((q, i) => (
-              <tr key={i} className="border-t">
-                <td className="p-3 font-medium">{q.quizTitle}</td>
-                <td className="p-3">{q.score}%</td>
+              <tr key={i} className="border-t border-gray-100">
+                <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                  {q.quizTitle}
+                </td>
+                <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
+                  {q.score}%
+                </td>
                 <td className="p-3">
                   <span
-                    className={`px-2 py-1 rounded text-xs ${
+                    className="px-2 py-1 rounded-full text-xs font-medium"
+                    style={
                       q.passed
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
+                        ? { background: "var(--color-accent-light)", color: "var(--color-accent)" }
+                        : { background: "var(--color-danger-light)", color: "var(--color-danger)" }
+                    }
                   >
                     {q.passed ? "Passed" : "Failed"}
                   </span>
                 </td>
-                <td className="p-3">
+                <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
                   {new Date(q.attemptedAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {progress.quizzes.length === 0 && (
               <tr>
-                <td colSpan="4" className="p-6 text-center text-gray-500">
+                <td colSpan="4" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
                   No quiz attempts yet.
                 </td>
               </tr>
@@ -172,6 +220,6 @@ export default function StudentDetail() {
           </tbody>
         </table>
       </div>
-    </div>
+    </motion.div>
   );
 }

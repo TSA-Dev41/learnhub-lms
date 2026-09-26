@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -6,58 +6,59 @@ export default function Students() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const ignoreRef = useRef(false);
 
-  const fetchStudents = useCallback(() => {
-    let isActive = true;
-
+  const fetchStudents = useCallback(async () => {
     setLoading(true);
     setError("");
 
-    api
-      .get("/admin/students")
-      .then((res) => {
-        if (isActive) setStudents(res.data.data);
-      })
-      .catch(() => {
-        if (isActive) setError("Unable to load students.");
-      })
-      .finally(() => {
-        if (isActive) setLoading(false);
-      });
-
-    return () => {
-      isActive = false;
-    };
+    try {
+      const res = await api.get("/admin/students");
+      if (!ignoreRef.current) setStudents(res.data.data);
+    } catch {
+      if (!ignoreRef.current) setError("Unable to load students.");
+    } finally {
+      if (!ignoreRef.current) setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    let isActive = true;
+    let active = true;
 
-    api
-      .get("/admin/students")
-      .then((res) => {
-        if (isActive) setStudents(res.data.data);
-      })
-      .catch(() => {
-        if (isActive) setError("Unable to load students.");
-      })
-      .finally(() => {
-        if (isActive) setLoading(false);
-      });
+    const loadStudents = async () => {
+      ignoreRef.current = false;
+      if (active) {
+        await fetchStudents();
+      }
+    };
+
+    loadStudents();
 
     return () => {
-      isActive = false;
+      active = false;
+      ignoreRef.current = true;
     };
-  }, []);
+  }, [fetchStudents]);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Students</h1>
+      <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--color-text)" }}>
+        Students
+      </h1>
 
-      {loading && <p className="text-gray-500">Loading students...</p>}
+      {loading && (
+        <div className="space-y-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-12 w-full rounded-lg skeleton" />
+          ))}
+        </div>
+      )}
 
       {!loading && error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded flex items-center justify-between gap-3">
+        <div
+          className="p-3 rounded-lg flex items-center justify-between gap-3"
+          style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+        >
           <span>{error}</span>
           <button
             onClick={fetchStudents}
@@ -69,28 +70,33 @@ export default function Students() {
       )}
 
       {!loading && !error && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-left">
-              <tr>
-                <th className="p-3">Name</th>
-                <th className="p-3">Email</th>
-                <th className="p-3">Joined</th>
-                <th className="p-3">Actions</th>
+            <thead style={{ background: "var(--color-primary-light)" }}>
+              <tr className="text-left">
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Name</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Email</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Joined</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {students.map((s) => (
-                <tr key={s._id} className="border-t">
-                  <td className="p-3 font-medium">{s.name}</td>
-                  <td className="p-3">{s.email}</td>
-                  <td className="p-3">
+                <tr key={s._id} className="border-t border-gray-100">
+                  <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                    {s.name}
+                  </td>
+                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
+                    {s.email}
+                  </td>
+                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
                     {new Date(s.createdAt).toLocaleDateString()}
                   </td>
                   <td className="p-3">
                     <Link
                       to={`/admin/students/${s._id}`}
-                      className="text-blue-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-primary)" }}
                     >
                       View Details
                     </Link>
@@ -99,7 +105,11 @@ export default function Students() {
               ))}
               {students.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="p-6 text-center text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="p-6 text-center"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     No students yet.
                   </td>
                 </tr>

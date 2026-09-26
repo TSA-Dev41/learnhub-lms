@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../../services/api";
+
+const statusStyle = {
+  published: { background: "var(--color-accent-light)", color: "var(--color-accent)" },
+  draft: { background: "var(--color-warning-light)", color: "var(--color-warning)" },
+  archived: { background: "#f3f4f6", color: "var(--color-text-muted)" },
+};
 
 export default function ManageCourses() {
   const [courses, setCourses] = useState([]);
@@ -12,8 +19,6 @@ export default function ManageCourses() {
     try {
       setLoading(true);
       setError("");
-      // Admin sees ALL statuses via the dedicated admin endpoint —
-      // no more merging published-only results.
       const res = await api.get("/admin/courses", { params: { limit: 100 } });
       if (!ignoreRef.current) {
         setCourses(res.data.data);
@@ -31,8 +36,13 @@ export default function ManageCourses() {
 
   useEffect(() => {
     ignoreRef.current = false;
-    fetchCourses();
+
+    const timer = window.setTimeout(() => {
+      fetchCourses();
+    }, 0);
+
     return () => {
+      window.clearTimeout(timer);
       ignoreRef.current = true;
     };
   }, [fetchCourses]);
@@ -57,21 +67,37 @@ export default function ManageCourses() {
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manage Courses</h1>
+        <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>
+          Manage Courses
+        </h1>
         <Link
           to="/admin/courses/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="text-white px-4 py-2 rounded-lg transition-colors"
+          style={{ background: "var(--color-primary)" }}
         >
           + New Course
         </Link>
       </div>
 
-      {loading && <p className="text-gray-500">Loading courses...</p>}
+      {loading && (
+        <div className="space-y-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-12 w-full rounded-lg skeleton" />
+          ))}
+        </div>
+      )}
 
       {!loading && error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded flex items-center justify-between gap-3">
+        <div
+          className="p-3 rounded-lg flex items-center justify-between gap-3"
+          style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+        >
           <span>{error}</span>
           <button
             onClick={fetchCourses}
@@ -83,45 +109,46 @@ export default function ManageCourses() {
       )}
 
       {!loading && !error && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-left">
-              <tr>
-                <th className="p-3">Title</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
+            <thead style={{ background: "var(--color-primary-light)" }}>
+              <tr className="text-left">
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Title</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Category</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Status</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {courses.map((course) => (
-                <tr key={course._id} className="border-t">
-                  <td className="p-3 font-medium">{course.title}</td>
-                  <td className="p-3">{course.category}</td>
+                <tr key={course._id} className="border-t border-gray-100">
+                  <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                    {course.title}
+                  </td>
+                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
+                    {course.category}
+                  </td>
                   <td className="p-3">
                     <span
-                      className={`px-2 py-1 rounded text-xs capitalize ${
-                        course.status === "published"
-                          ? "bg-green-100 text-green-700"
-                          : course.status === "draft"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
+                      className="px-2 py-1 rounded-full text-xs capitalize font-medium"
+                      style={statusStyle[course.status]}
                     >
                       {course.status}
                     </span>
                   </td>
-                  <td className="p-3 space-x-2">
+                  <td className="p-3 space-x-3 text-sm">
                     <Link
                       to={`/admin/courses/${course._id}/edit`}
-                      className="text-blue-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-primary)" }}
                     >
                       Edit
                     </Link>
                     {course.status !== "published" && (
                       <button
                         onClick={() => handleStatusChange(course._id, "published")}
-                        className="text-green-600 hover:underline"
+                        className="hover:underline"
+                        style={{ color: "var(--color-accent)" }}
                       >
                         Publish
                       </button>
@@ -129,26 +156,30 @@ export default function ManageCourses() {
                     {course.status === "published" && (
                       <button
                         onClick={() => handleStatusChange(course._id, "archived")}
-                        className="text-gray-600 hover:underline"
+                        className="hover:underline"
+                        style={{ color: "var(--color-text-muted)" }}
                       >
                         Archive
                       </button>
                     )}
                     <Link
                       to={`/admin/courses/${course._id}/lessons`}
-                      className="text-purple-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-primary)" }}
                     >
                       Lessons
                     </Link>
                     <Link
                       to={`/admin/courses/${course._id}/quizzes`}
-                      className="text-indigo-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-primary)" }}
                     >
                       Quizzes
                     </Link>
                     <button
                       onClick={() => handleDelete(course._id)}
-                      className="text-red-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-danger)" }}
                     >
                       Delete
                     </button>
@@ -157,7 +188,7 @@ export default function ManageCourses() {
               ))}
               {courses.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="p-6 text-center text-gray-500">
+                  <td colSpan="4" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
                     No courses yet. Create your first one.
                   </td>
                 </tr>
@@ -166,6 +197,6 @@ export default function ManageCourses() {
           </table>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+
+const inputClass =
+  "w-full rounded-lg px-3 py-2 border border-gray-200 bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-shadow";
+const labelClass = "block text-sm font-medium mb-1";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
@@ -38,67 +43,56 @@ export default function CreateCourse() {
   };
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Create Course</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="max-w-2xl"
+    >
+      <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--color-text)" }}>
+        Create Course
+      </h1>
 
       {error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>
+        <p
+          className="p-3 rounded-lg mb-4"
+          style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+        >
+          {error}
+        </p>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Title</label>
+          <input name="title" value={form.title} onChange={handleChange} required className={inputClass} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Description</label>
           <textarea
             name="description"
             value={form.description}
             onChange={handleChange}
             required
             rows={4}
-            className="w-full border rounded px-3 py-2"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Instructor</label>
-          <input
-            name="instructor"
-            value={form.instructor}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Instructor</label>
+          <input name="instructor" value={form.instructor} onChange={handleChange} required className={inputClass} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Category</label>
-          <input
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Category</label>
+          <input name="category" value={form.category} onChange={handleChange} required className={inputClass} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Level</label>
-          <select
-            name="level"
-            value={form.level}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          >
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Level</label>
+          <select name="level" value={form.level} onChange={handleChange} className={inputClass}>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
@@ -106,7 +100,7 @@ export default function CreateCourse() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>
             Thumbnail URL (optional)
           </label>
           <input
@@ -114,40 +108,38 @@ export default function CreateCourse() {
             value={form.thumbnail}
             onChange={handleChange}
             placeholder="https://..."
-            className="w-full border rounded px-3 py-2"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Status</label>
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          >
+          <label className={labelClass} style={{ color: "var(--color-text)" }}>Status</label>
+          <select name="status" value={form.status} onChange={handleChange} className={inputClass}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
           </select>
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={submitting}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            className="text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors"
+            style={{ background: "var(--color-primary)" }}
           >
             {submitting ? "Creating..." : "Create Course"}
-          </button>
+          </motion.button>
           <button
             type="button"
             onClick={() => navigate("/admin/courses")}
-            className="px-4 py-2 rounded border hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            style={{ color: "var(--color-text)" }}
           >
             Cancel
           </button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }

@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../../services/api";
+
+const inputClass =
+  "w-full rounded-lg px-3 py-2 border border-gray-200 bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-shadow";
+const labelClass = "block text-sm font-medium mb-1";
 
 const emptyForm = {
   title: "",
@@ -20,7 +25,7 @@ export default function ManageLessons() {
   const ignoreRef = useRef(false);
 
   const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState(null); // null = creating new
+  const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -45,7 +50,13 @@ export default function ManageLessons() {
 
   useEffect(() => {
     ignoreRef.current = false;
-    fetchLessons();
+
+    const loadLessons = async () => {
+      await fetchLessons();
+    };
+
+    void loadLessons();
+
     return () => {
       ignoreRef.current = true;
     };
@@ -106,66 +117,83 @@ export default function ManageLessons() {
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manage Lessons</h1>
-        <Link to="/admin/courses" className="text-blue-600 hover:underline text-sm">
+        <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>
+          Manage Lessons
+        </h1>
+        <Link
+          to="/admin/courses"
+          className="hover:underline text-sm"
+          style={{ color: "var(--color-primary)" }}
+        >
           ← Back to Courses
         </Link>
       </div>
 
       {/* Lesson list */}
       {loading ? (
-        <p className="text-gray-500">Loading lessons...</p>
+        <div className="space-y-2 mb-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-12 w-full rounded-lg skeleton" />
+          ))}
+        </div>
       ) : loadError ? (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-8 flex items-center justify-between gap-3">
+        <div
+          className="p-3 rounded-lg mb-8 flex items-center justify-between gap-3"
+          style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+        >
           <span>{loadError}</span>
-          <button
-            onClick={fetchLessons}
-            className="text-sm font-medium underline shrink-0"
-          >
+          <button onClick={fetchLessons} className="text-sm font-medium underline shrink-0">
             Retry
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-left">
-              <tr>
-                <th className="p-3">Order</th>
-                <th className="p-3">Title</th>
-                <th className="p-3">Duration</th>
-                <th className="p-3">Published</th>
-                <th className="p-3">Actions</th>
+            <thead style={{ background: "var(--color-primary-light)" }}>
+              <tr className="text-left">
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Order</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Title</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Duration</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Published</th>
+                <th className="p-3" style={{ color: "var(--color-text)" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {lessons.map((lesson) => (
-                <tr key={lesson._id} className="border-t">
-                  <td className="p-3">{lesson.order}</td>
-                  <td className="p-3 font-medium">{lesson.title}</td>
-                  <td className="p-3">{lesson.duration || 0} min</td>
+                <tr key={lesson._id} className="border-t border-gray-100">
+                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>{lesson.order}</td>
+                  <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>{lesson.title}</td>
+                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>{lesson.duration || 0} min</td>
                   <td className="p-3">
                     <span
-                      className={`px-2 py-1 rounded text-xs ${
+                      className="px-2 py-1 rounded-full text-xs font-medium"
+                      style={
                         lesson.published
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
+                          ? { background: "var(--color-accent-light)", color: "var(--color-accent)" }
+                          : { background: "var(--color-warning-light)", color: "var(--color-warning)" }
+                      }
                     >
                       {lesson.published ? "Published" : "Draft"}
                     </span>
                   </td>
-                  <td className="p-3 space-x-2">
+                  <td className="p-3 space-x-3 text-sm">
                     <button
                       onClick={() => startEdit(lesson)}
-                      className="text-blue-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-primary)" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(lesson._id)}
-                      className="text-red-600 hover:underline"
+                      className="hover:underline"
+                      style={{ color: "var(--color-danger)" }}
                     >
                       Delete
                     </button>
@@ -174,7 +202,7 @@ export default function ManageLessons() {
               ))}
               {lessons.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="p-6 text-center text-gray-500">
+                  <td colSpan="5" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
                     No lessons yet. Add one below.
                   </td>
                 </tr>
@@ -185,50 +213,44 @@ export default function ManageLessons() {
       )}
 
       {/* Create / Edit form */}
-      <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
-        <h2 className="text-lg font-bold mb-4">
+      <div className="bg-surface rounded-lg shadow-sm p-6 max-w-2xl">
+        <h2 className="text-lg font-bold mb-4" style={{ color: "var(--color-text)" }}>
           {editingId ? "Edit Lesson" : "Add New Lesson"}
         </h2>
 
         {formError && (
-          <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{formError}</p>
+          <p
+            className="p-3 rounded-lg mb-4"
+            style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+          >
+            {formError}
+          </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Title</label>
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-            />
+            <label className={labelClass} style={{ color: "var(--color-text)" }}>Title</label>
+            <input name="title" value={form.title} onChange={handleChange} required className={inputClass} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <input
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
+            <label className={labelClass} style={{ color: "var(--color-text)" }}>Description</label>
+            <input name="description" value={form.description} onChange={handleChange} className={inputClass} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Content</label>
+            <label className={labelClass} style={{ color: "var(--color-text)" }}>Content</label>
             <textarea
               name="content"
               value={form.content}
               onChange={handleChange}
               rows={5}
-              className="w-full border rounded px-3 py-2"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className={labelClass} style={{ color: "var(--color-text)" }}>
               Video URL (optional)
             </label>
             <input
@@ -236,24 +258,24 @@ export default function ManageLessons() {
               value={form.videoUrl}
               onChange={handleChange}
               placeholder="https://..."
-              className="w-full border rounded px-3 py-2"
+              className={inputClass}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Order</label>
+              <label className={labelClass} style={{ color: "var(--color-text)" }}>Order</label>
               <input
                 type="number"
                 name="order"
                 value={form.order}
                 onChange={handleChange}
                 min={1}
-                className="w-full border rounded px-3 py-2"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className={labelClass} style={{ color: "var(--color-text)" }}>
                 Duration (minutes)
               </label>
               <input
@@ -262,7 +284,7 @@ export default function ManageLessons() {
                 value={form.duration}
                 onChange={handleChange}
                 min={0}
-                className="w-full border rounded px-3 py-2"
+                className={inputClass}
               />
             </div>
           </div>
@@ -275,24 +297,27 @@ export default function ManageLessons() {
               onChange={handleChange}
               id="published"
             />
-            <label htmlFor="published" className="text-sm font-medium">
+            <label htmlFor="published" className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
               Published
             </label>
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               type="submit"
               disabled={submitting}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              className="text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors"
+              style={{ background: "var(--color-primary)" }}
             >
               {submitting ? "Saving..." : editingId ? "Save Changes" : "Add Lesson"}
-            </button>
+            </motion.button>
             {editingId && (
               <button
                 type="button"
                 onClick={cancelEdit}
-                className="px-4 py-2 rounded border hover:bg-gray-50"
+                className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                style={{ color: "var(--color-text)" }}
               >
                 Cancel
               </button>
@@ -300,6 +325,6 @@ export default function ManageLessons() {
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }
