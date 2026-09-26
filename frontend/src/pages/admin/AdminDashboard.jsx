@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen flex">
       <aside
-        className="w-56 min-h-screen p-4 shadow-sm"
+        className="w-56 min-h-screen p-4 shadow-sm flex flex-col"
         style={{ background: "var(--color-surface)" }}
       >
         <div className="mb-6 px-1">
@@ -20,7 +20,8 @@ export default function AdminDashboard() {
             Admin Panel
           </p>
         </div>
-        <nav className="space-y-1">
+
+        <nav className="space-y-1 flex-1">
           {navItems.map((item) => (
             <NavLink key={item.path} to={item.path} end={item.end}>
               {({ isActive }) => (
@@ -38,6 +39,16 @@ export default function AdminDashboard() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Explicit way back to the public site */}
+        <NavLink to="/" className="pt-3 mt-3 border-t border-gray-100">
+          <span
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            ← Home
+          </span>
+        </NavLink>
       </aside>
 
       <main className="flex-1 p-8">

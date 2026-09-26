@@ -1,5 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -19,68 +21,80 @@ import ManageLessons from "./pages/admin/ManageLessons";
 import ManageQuizzes from "./pages/admin/ManageQuizzes";
 import Students from "./pages/admin/Students";
 import StudentDetail from "./pages/admin/StudentDetail";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Chatbot from "./components/Chatbot";
 
 function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/courses" element={<Catalogue />} />
-        <Route path="/courses/:id" element={<CourseDetails />} />
-        <Route path="/" element={<Catalogue />} />
-        <Route
-          path="/lessons/:id"
-          element={
-            <ProtectedRoute>
-              <Lesson />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/quizzes/:id"
-          element={
-            <ProtectedRoute>
-              <Quiz />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/quizzes/:id/result"
-          element={
-            <ProtectedRoute>
-              <QuizResult />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
-        >
-          <Route index element={<AdminOverview />} />
-          <Route path="courses" element={<ManageCourses />} />
-          <Route path="courses/new" element={<CreateCourse />} />
-          <Route path="courses/:id/edit" element={<EditCourse />} />
-          <Route path="courses/:id/lessons" element={<ManageLessons />} />
-          <Route path="courses/:id/quizzes" element={<ManageQuizzes />} />
-          <Route path="students" element={<Students />} />
-          <Route path="students/:id" element={<StudentDetail />} />
-        </Route>
-      </Routes>
-    </>
+    <div className="min-h-screen flex flex-col">
+      {!isAdminRoute && <Navbar />}
+      <div className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/courses" element={<Catalogue />} />
+          <Route path="/courses/:id" element={<CourseDetails />} />
+          <Route
+            path="/lessons/:id"
+            element={
+              <ProtectedRoute>
+                <Lesson />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:id"
+            element={
+              <ProtectedRoute>
+                <Quiz />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:id/result"
+            element={
+              <ProtectedRoute>
+                <QuizResult />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<AdminOverview />} />
+            <Route path="courses" element={<ManageCourses />} />
+            <Route path="courses/new" element={<CreateCourse />} />
+            <Route path="courses/:id/edit" element={<EditCourse />} />
+            <Route path="courses/:id/lessons" element={<ManageLessons />} />
+            <Route path="courses/:id/quizzes" element={<ManageQuizzes />} />
+            <Route path="students" element={<Students />} />
+            <Route path="students/:id" element={<StudentDetail />} />
+          </Route>
+        </Routes>
+      </div>
+      <Chatbot />
+      {!isAdminRoute && <Footer />}
+    </div>
   );
 }
 
