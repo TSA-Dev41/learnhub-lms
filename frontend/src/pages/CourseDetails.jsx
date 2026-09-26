@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
@@ -56,16 +57,27 @@ export default function CourseDetails() {
   };
 
   if (loading) {
-    return <p className="p-8 text-gray-500">Loading course...</p>;
+    return (
+      <div className="min-h-screen p-8 max-w-3xl mx-auto">
+        <div className="h-6 w-24 rounded skeleton mb-3" />
+        <div className="h-9 w-2/3 rounded skeleton mb-4" />
+        <div className="h-4 w-full rounded skeleton mb-2" />
+        <div className="h-4 w-5/6 rounded skeleton mb-6" />
+        <div className="h-10 w-48 rounded-lg skeleton" />
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="p-8">
-        <p className="text-red-600 mb-3">{error}</p>
+        <p className="mb-3" style={{ color: "var(--color-danger)" }}>
+          {error}
+        </p>
         <button
           onClick={fetchCourseData}
-          className="text-sm font-medium text-blue-600 underline"
+          className="text-sm font-medium underline"
+          style={{ color: "var(--color-primary)" }}
         >
           Retry
         </button>
@@ -77,19 +89,31 @@ export default function CourseDetails() {
 
   const loadedCourseId = course._id ?? course.id;
   if (String(loadedCourseId) !== String(id)) {
-    return <p className="p-8 text-gray-500">Loading course...</p>;
+    return <p className="p-8" style={{ color: "var(--color-text-muted)" }}>Loading course...</p>;
   }
 
   const isEnrolled = lessons.some((l) => l.hasAccess);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 max-w-3xl mx-auto">
-      <span className="text-xs uppercase tracking-wide text-blue-600 font-semibold">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="min-h-screen p-8 max-w-3xl mx-auto"
+    >
+      <span
+        className="text-xs uppercase tracking-wide font-semibold"
+        style={{ color: "var(--color-primary)" }}
+      >
         {course.category}
       </span>
-      <h1 className="text-3xl font-bold mt-1">{course.title}</h1>
-      <p className="text-gray-600 mt-2">{course.description}</p>
-      <div className="flex gap-4 text-sm text-gray-500 mt-3">
+      <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--color-text)" }}>
+        {course.title}
+      </h1>
+      <p className="mt-2" style={{ color: "var(--color-text-muted)" }}>
+        {course.description}
+      </p>
+      <div className="flex gap-4 text-sm mt-3" style={{ color: "var(--color-text-muted)" }}>
         <span>Instructor: {course.instructor}</span>
         <span className="capitalize">Level: {course.level}</span>
       </div>
@@ -99,56 +123,69 @@ export default function CourseDetails() {
         {!user && (
           <Link
             to="/login"
-            className="inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+            className="inline-block text-white px-5 py-2 rounded-lg transition-colors"
+            style={{ background: "var(--color-primary)" }}
           >
             Log in to Enroll
           </Link>
         )}
 
         {user && !isEnrolled && (
-          <button
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={handleEnroll}
             disabled={enrolling}
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            className="text-white px-5 py-2 rounded-lg disabled:opacity-50 transition-colors"
+            style={{ background: "var(--color-primary)" }}
           >
             {enrolling ? "Enrolling..." : "Enroll in this Course"}
-          </button>
+          </motion.button>
         )}
 
         {user && isEnrolled && (
-          <span className="inline-block bg-green-100 text-green-700 px-4 py-2 rounded">
+          <span
+            className="inline-block px-4 py-2 rounded-lg font-medium"
+            style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}
+          >
             You're enrolled — start learning below
           </span>
         )}
 
         {enrollMessage && (
-          <p className="text-sm mt-2 text-gray-600">{enrollMessage}</p>
+          <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>
+            {enrollMessage}
+          </p>
         )}
       </div>
 
       {/* Lessons list */}
-      <h2 className="text-xl font-bold mt-8 mb-3">Lessons</h2>
+      <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "var(--color-text)" }}>
+        Lessons
+      </h2>
       {lessons.length === 0 && (
-        <p className="text-gray-500">No lessons available yet.</p>
+        <p style={{ color: "var(--color-text-muted)" }}>No lessons available yet.</p>
       )}
       <ul className="space-y-2">
         {lessons.map((lesson) => (
           <li
             key={lesson.id}
-            className="bg-white border rounded p-3 flex justify-between items-center"
+            className="bg-[var(--color-surface)] rounded-lg shadow-sm p-3 flex justify-between items-center"
           >
-            <span>
+            <span style={{ color: "var(--color-text)" }}>
               {lesson.order}. {lesson.title}
             </span>
             {lesson.hasAccess ? (
               <Link
                 to={`/lessons/${lesson.id}`}
-                className="text-blue-600 text-sm hover:underline"
+                className="text-sm hover:underline"
+                style={{ color: "var(--color-primary)" }}
               >
                 View lesson
               </Link>
             ) : (
-              <span className="text-gray-400 text-sm">🔒 Locked</span>
+              <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                🔒 Locked
+              </span>
             )}
           </li>
         ))}
@@ -157,28 +194,33 @@ export default function CourseDetails() {
       {/* Quizzes */}
       {quizzes.length > 0 && (
         <>
-          <h2 className="text-xl font-bold mt-8 mb-3">Quizzes</h2>
+          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "var(--color-text)" }}>
+            Quizzes
+          </h2>
           <ul className="space-y-2">
             {quizzes.map((quiz) => (
               <li
                 key={quiz._id}
-                className="bg-white border rounded p-3 flex justify-between items-center"
+                className="bg-[var(--color-surface)] rounded-lg shadow-sm p-3 flex justify-between items-center"
               >
                 <div>
-                  <p className="font-medium">{quiz.title}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium" style={{ color: "var(--color-text)" }}>
+                    {quiz.title}
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
                     Passing score: {quiz.passingScore}%
                   </p>
                 </div>
                 {isEnrolled ? (
                   <Link
                     to={`/quizzes/${quiz._id}`}
-                    className="text-blue-600 text-sm hover:underline"
+                    className="text-sm hover:underline"
+                    style={{ color: "var(--color-primary)" }}
                   >
                     Take Quiz
                   </Link>
                 ) : (
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
                     🔒 Enroll to unlock
                   </span>
                 )}
@@ -187,6 +229,6 @@ export default function CourseDetails() {
           </ul>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -1,1 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-primary-light: #eef2ff;
+
+  --color-accent: #10b981;
+  --color-accent-light: #d1fae5;
+
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+
+  --color-danger: #ef4444;
+  --color-danger-light: #fee2e2;
+
+  --color-bg: #f8f9fc;
+  --color-surface: #ffffff;
+
+  --color-text: #1e1b2e;
+  --color-text-muted: #6b7280;
+
+  /* Fonts */
+  --font-heading: "Lexend", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* Shimmer loading skeleton, replaces flat animate-pulse */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 37%,
+    #e5e7eb 63%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}

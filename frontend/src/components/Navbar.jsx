@@ -1,44 +1,45 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Logo from "./Logo";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
 
+  const navLinkClass =
+    "text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors";
+
   return (
-    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-      <Link to="/" className="text-xl font-bold text-blue-600">
-        LearnHub
-      </Link>
-      <div className="flex items-center gap-4">
-        <Link to="/" className="text-gray-700 hover:text-blue-600">
+    <nav className="bg-[var(--color-surface)] shadow-sm px-6 py-4 flex justify-between items-center">
+      <Logo />
+      <div className="flex items-center gap-5">
+        <Link to="/" className={navLinkClass}>
           Courses
         </Link>
         {user ? (
           <>
-            <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
+            <Link to="/dashboard" className={navLinkClass}>
               Dashboard
             </Link>
             {user.role === "admin" && (
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600">
+              <Link to="/admin" className={navLinkClass}>
                 Admin Panel
               </Link>
             )}
             <button
               onClick={logout}
-              className="bg-gray-200 px-3 py-1.5 rounded hover:bg-gray-300 text-sm"
+              className="bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 text-sm transition-colors"
             >
               Logout
             </button>
           </>
         ) : (
-          
           <>
-            <Link to="/login" className="text-gray-700 hover:text-blue-600">
+            <Link to="/login" className={navLinkClass}>
               Login
             </Link>
             <Link
               to="/register"
-              className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 text-sm"
+              className="bg-[var(--color-primary)] text-white px-3 py-1.5 rounded-lg hover:bg-[var(--color-primary-dark)] text-sm transition-colors"
             >
               Register
             </Link>

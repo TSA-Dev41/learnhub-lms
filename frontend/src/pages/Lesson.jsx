@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../services/api";
 
 export default function Lesson() {
@@ -9,6 +10,7 @@ export default function Lesson() {
   const [error, setError] = useState("");
   const [completing, setCompleting] = useState(false);
   const [completeError, setCompleteError] = useState("");
+  const cancelledRef = useRef(false);
 
   const fetchLesson = useCallback(() => {
     setLoadedLessonId(null);
@@ -17,11 +19,13 @@ export default function Lesson() {
     api
       .get(`/lessons/${id}`)
       .then((res) => {
+        if (cancelledRef.current) return;
         setLesson(res.data.data);
         setError("");
         setLoadedLessonId(id);
       })
       .catch((err) => {
+        if (cancelledRef.current) return;
         setError(
           err.response?.data?.message ||
             "Unable to load this lesson. Please try again."
@@ -31,29 +35,12 @@ export default function Lesson() {
   }, [id]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    api
-      .get(`/lessons/${id}`)
-      .then((res) => {
-        if (cancelled) return;
-        setLesson(res.data.data);
-        setError("");
-        setLoadedLessonId(id);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(
-          err.response?.data?.message ||
-            "Unable to load this lesson. Please try again."
-        );
-        setLoadedLessonId(id);
-      });
-
+    cancelledRef.current = false;
+    fetchLesson();
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
-  }, [id]);
+  }, [fetchLesson]);
 
   const handleComplete = async () => {
     setCompleting(true);
@@ -71,21 +58,31 @@ export default function Lesson() {
   };
 
   if (loadedLessonId !== id) {
-    return <p className="p-8 text-gray-500">Loading lesson...</p>;
+    return (
+      <div className="min-h-screen p-8 max-w-3xl mx-auto">
+        <div className="h-4 w-20 rounded skeleton mb-2" />
+        <div className="h-9 w-2/3 rounded skeleton mb-4" />
+        <div className="h-64 w-full rounded-lg skeleton mb-6" />
+        <div className="h-10 w-40 rounded-lg skeleton" />
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="p-8">
-        <p className="text-red-600 mb-3">{error}</p>
+        <p className="mb-3" style={{ color: "var(--color-danger)" }}>
+          {error}
+        </p>
         <div className="flex items-center gap-4">
           <button
             onClick={fetchLesson}
-            className="text-sm font-medium text-blue-600 underline"
+            className="text-sm font-medium underline"
+            style={{ color: "var(--color-primary)" }}
           >
             Retry
           </button>
-          <Link to="/" className="text-blue-600 hover:underline text-sm">
+          <Link to="/" className="hover:underline text-sm" style={{ color: "var(--color-primary)" }}>
             ← Back to courses
           </Link>
         </div>
@@ -96,39 +93,58 @@ export default function Lesson() {
   if (!lesson) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 max-w-3xl mx-auto">
-      <p className="text-sm text-gray-500 mb-2">Lesson {lesson.order}</p>
-      <h1 className="text-3xl font-bold mb-4">{lesson.title}</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="min-h-screen p-8 max-w-3xl mx-auto"
+    >
+      <p className="text-sm mb-2" style={{ color: "var(--color-text-muted)" }}>
+        Lesson {lesson.order}
+      </p>
+      <h1 className="text-3xl font-bold mb-4" style={{ color: "var(--color-text)" }}>
+        {lesson.title}
+      </h1>
 
       {lesson.videoUrl && (
-        <div className="mb-6 aspect-video bg-black rounded overflow-hidden">
+        <div className="mb-6 aspect-video bg-black rounded-lg overflow-hidden">
           <video src={lesson.videoUrl} controls className="w-full h-full" />
         </div>
       )}
 
-      <div className="bg-white border rounded p-6 mb-6 whitespace-pre-line">
+      <div
+        className="bg-[var(--color-surface)] rounded-lg shadow-sm p-6 mb-6 whitespace-pre-line"
+        style={{ color: "var(--color-text)" }}
+      >
         {lesson.content || "No content added for this lesson yet."}
       </div>
 
       <div className="flex items-center gap-4">
         {lesson.completed ? (
-          <span className="bg-green-100 text-green-700 px-4 py-2 rounded">
+          <span
+            className="px-4 py-2 rounded-lg font-medium"
+            style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}
+          >
             ✓ Completed
           </span>
         ) : (
-          <button
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={handleComplete}
             disabled={completing}
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            className="text-white px-5 py-2 rounded-lg disabled:opacity-50 transition-colors"
+            style={{ background: "var(--color-primary)" }}
           >
             {completing ? "Saving..." : "Mark as Complete"}
-          </button>
+          </motion.button>
         )}
       </div>
 
       {completeError && (
-        <p className="text-sm mt-2 text-red-600">{completeError}</p>
+        <p className="text-sm mt-2" style={{ color: "var(--color-danger)" }}>
+          {completeError}
+        </p>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../services/api";
 
 export default function Quiz() {
@@ -76,20 +77,35 @@ export default function Quiz() {
     }
   };
 
-  if (loading) return <p className="p-8 text-gray-500">Loading quiz...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen p-8 max-w-2xl mx-auto">
+        <div className="h-8 w-1/2 rounded skeleton mb-3" />
+        <div className="h-4 w-1/3 rounded skeleton mb-6" />
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-28 w-full rounded-lg skeleton" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (error && !quiz) {
     return (
       <div className="p-8">
-        <p className="text-red-600 mb-3">{error}</p>
+        <p className="mb-3" style={{ color: "var(--color-danger)" }}>
+          {error}
+        </p>
         <div className="flex items-center gap-4">
           <button
             onClick={fetchQuiz}
-            className="text-sm font-medium text-blue-600 underline"
+            className="text-sm font-medium underline"
+            style={{ color: "var(--color-primary)" }}
           >
             Retry
           </button>
-          <Link to="/" className="text-blue-600 hover:underline text-sm">
+          <Link to="/" className="hover:underline text-sm" style={{ color: "var(--color-primary)" }}>
             ← Back to courses
           </Link>
         </div>
@@ -102,63 +118,90 @@ export default function Quiz() {
   const allAnswered = quiz.questions.every((q) => answers[q.id]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-1">{quiz.title}</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="min-h-screen p-8 max-w-2xl mx-auto"
+    >
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--color-text)" }}>
+        {quiz.title}
+      </h1>
       {quiz.description && (
-        <p className="text-gray-600 mb-6">{quiz.description}</p>
+        <p className="mb-6" style={{ color: "var(--color-text-muted)" }}>
+          {quiz.description}
+        </p>
       )}
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm mb-6" style={{ color: "var(--color-text-muted)" }}>
         Passing score: {quiz.passingScore}%
       </p>
 
       {error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>
+        <p
+          className="p-3 rounded-lg mb-4"
+          style={{ background: "var(--color-danger-light)", color: "var(--color-danger)" }}
+        >
+          {error}
+        </p>
       )}
 
       <div className="space-y-6">
         {quiz.questions.map((question, index) => (
-          <div key={question.id} className="bg-white border rounded p-5">
-            <p className="font-semibold mb-3">
+          <div
+            key={question.id}
+            className="bg-[var(--color-surface)] rounded-lg shadow-sm p-5"
+          >
+            <p className="font-semibold mb-3" style={{ color: "var(--color-text)" }}>
               {index + 1}. {question.text}
             </p>
             <div className="space-y-2">
-              {question.options.map((option) => (
-                <label
-                  key={option}
-                  className={`flex items-center gap-2 border rounded px-3 py-2 cursor-pointer ${
-                    answers[question.id] === option
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name={question.id}
-                    value={option}
-                    checked={answers[question.id] === option}
-                    onChange={() => selectAnswer(question.id, option)}
-                  />
-                  {option}
-                </label>
-              ))}
+              {question.options.map((option) => {
+                const selected = answers[question.id] === option;
+                return (
+                  <motion.label
+                    key={option}
+                    whileTap={{ scale: 0.99 }}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer border transition-colors"
+                    style={
+                      selected
+                        ? {
+                            borderColor: "var(--color-primary)",
+                            background: "var(--color-primary-light)",
+                          }
+                        : { borderColor: "#e5e7eb" }
+                    }
+                  >
+                    <input
+                      type="radio"
+                      name={question.id}
+                      value={option}
+                      checked={selected}
+                      onChange={() => selectAnswer(question.id, option)}
+                    />
+                    <span style={{ color: "var(--color-text)" }}>{option}</span>
+                  </motion.label>
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
 
-      <button
+      <motion.button
+        whileTap={{ scale: 0.98 }}
         onClick={handleSubmit}
         disabled={!allAnswered || submitting}
-        className="mt-6 w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 disabled:opacity-50"
+        className="mt-6 w-full text-white py-3 rounded-lg disabled:opacity-50 transition-colors"
+        style={{ background: "var(--color-primary)" }}
       >
         {submitting ? "Submitting..." : "Submit Quiz"}
-      </button>
+      </motion.button>
 
       {!allAnswered && (
-        <p className="text-sm text-gray-500 mt-2 text-center">
+        <p className="text-sm mt-2 text-center" style={{ color: "var(--color-text-muted)" }}>
           Answer all questions to submit.
         </p>
       )}
-    </div>
+    </motion.div>
   );
 }
