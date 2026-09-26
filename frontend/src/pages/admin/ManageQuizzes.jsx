@@ -57,8 +57,11 @@ export default function ManageQuizzes() {
 
   useEffect(() => {
     ignoreRef.current = false;
-    fetchQuizzes();
+    const fetchTimer = setTimeout(() => {
+      fetchQuizzes();
+    }, 0);
     return () => {
+      clearTimeout(fetchTimer);
       ignoreRef.current = true;
     };
   }, [fetchQuizzes]);

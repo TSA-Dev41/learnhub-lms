@@ -30,7 +30,9 @@ export default function StudentDetail() {
   }, [id]);
 
   useEffect(() => {
-    fetchStudentDetail();
+    const timeoutId = setTimeout(fetchStudentDetail, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [fetchStudentDetail]);
 
   if (loading) return <p className="text-gray-500">Loading...</p>;

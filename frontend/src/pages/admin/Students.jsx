@@ -8,18 +8,47 @@ export default function Students() {
   const [error, setError] = useState("");
 
   const fetchStudents = useCallback(() => {
+    let isActive = true;
+
     setLoading(true);
     setError("");
+
     api
       .get("/admin/students")
-      .then((res) => setStudents(res.data.data))
-      .catch(() => setError("Unable to load students."))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (isActive) setStudents(res.data.data);
+      })
+      .catch(() => {
+        if (isActive) setError("Unable to load students.");
+      })
+      .finally(() => {
+        if (isActive) setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    let isActive = true;
+
+    api
+      .get("/admin/students")
+      .then((res) => {
+        if (isActive) setStudents(res.data.data);
+      })
+      .catch(() => {
+        if (isActive) setError("Unable to load students.");
+      })
+      .finally(() => {
+        if (isActive) setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <div>
