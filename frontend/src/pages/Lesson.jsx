@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 
@@ -8,8 +8,12 @@ export default function Lesson() {
   const [loadedLessonId, setLoadedLessonId] = useState(null);
   const [error, setError] = useState("");
   const [completing, setCompleting] = useState(false);
+  const [completeError, setCompleteError] = useState("");
 
-  useEffect(() => {
+  const fetchLesson = useCallback(() => {
+    setLoadedLessonId(null);
+    setError("");
+
     api
       .get(`/lessons/${id}`)
       .then((res) => {
@@ -23,16 +27,42 @@ export default function Lesson() {
             "Unable to load this lesson. Please try again."
         );
         setLoadedLessonId(id);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get(`/lessons/${id}`)
+      .then((res) => {
+        if (cancelled) return;
+        setLesson(res.data.data);
+        setError("");
+        setLoadedLessonId(id);
       })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(
+          err.response?.data?.message ||
+            "Unable to load this lesson. Please try again."
+        );
+        setLoadedLessonId(id);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const handleComplete = async () => {
     setCompleting(true);
+    setCompleteError("");
     try {
       await api.post(`/lessons/${id}/complete`);
       setLesson((prev) => ({ ...prev, completed: true }));
     } catch (err) {
-      setError(
+      setCompleteError(
         err.response?.data?.message || "Unable to mark this lesson complete."
       );
     } finally {
@@ -47,10 +77,18 @@ export default function Lesson() {
   if (error) {
     return (
       <div className="p-8">
-        <p className="text-red-600">{error}</p>
-        <Link to="/" className="text-blue-600 hover:underline text-sm">
-          ← Back to courses
-        </Link>
+        <p className="text-red-600 mb-3">{error}</p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={fetchLesson}
+            className="text-sm font-medium text-blue-600 underline"
+          >
+            Retry
+          </button>
+          <Link to="/" className="text-blue-600 hover:underline text-sm">
+            ← Back to courses
+          </Link>
+        </div>
       </div>
     );
   }
@@ -87,6 +125,10 @@ export default function Lesson() {
           </button>
         )}
       </div>
+
+      {completeError && (
+        <p className="text-sm mt-2 text-red-600">{completeError}</p>
+      )}
     </div>
   );
 }

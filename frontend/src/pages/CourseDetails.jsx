@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
@@ -14,7 +14,10 @@ export default function CourseDetails() {
   const [enrolling, setEnrolling] = useState(false);
   const [enrollMessage, setEnrollMessage] = useState("");
 
-  useEffect(() => {
+  const fetchCourseData = useCallback(() => {
+    setLoading(true);
+    setError("");
+
     Promise.all([
       api.get(`/courses/${id}`),
       api.get(`/courses/${id}/lessons`),
@@ -28,6 +31,14 @@ export default function CourseDetails() {
       .catch(() => setError("Unable to load this course. Please try again."))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchCourseData();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchCourseData]);
 
   const handleEnroll = async () => {
     setEnrolling(true);
@@ -49,7 +60,17 @@ export default function CourseDetails() {
   }
 
   if (error) {
-    return <p className="p-8 text-red-600">{error}</p>;
+    return (
+      <div className="p-8">
+        <p className="text-red-600 mb-3">{error}</p>
+        <button
+          onClick={fetchCourseData}
+          className="text-sm font-medium text-blue-600 underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (!course) return null;

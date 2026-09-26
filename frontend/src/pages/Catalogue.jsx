@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 import CourseCard from "../components/CourseCard";
 
@@ -20,12 +20,13 @@ export default function Catalogue() {
       .catch(() => {});
   }, []);
 
-  // Fetch courses whenever search/category/page changes
-  useEffect(() => {
+  const fetchCourses = useCallback(() => {
     const params = { page, limit: 9 };
     if (search) params.search = search;
     if (category) params.category = category;
     const queryKey = JSON.stringify({ search, category, page });
+
+    setError("");
 
     api
       .get("/courses", { params })
@@ -36,6 +37,13 @@ export default function Catalogue() {
       .catch(() => setError("Unable to load courses. Please try again."))
       .finally(() => setLoadedQuery(queryKey));
   }, [search, category, page]);
+
+  // Fetch courses whenever search/category/page changes
+  useEffect(() => {
+    const timeoutId = setTimeout(fetchCourses, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchCourses]);
 
   const loading =
     loadedQuery !== JSON.stringify({ search, category, page });
@@ -84,7 +92,15 @@ export default function Catalogue() {
 
       {/* Error state */}
       {!loading && error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded">{error}</p>
+        <div className="bg-red-100 text-red-700 p-3 rounded flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button
+            onClick={fetchCourses}
+            className="text-sm font-medium underline shrink-0"
+          >
+            Retry
+          </button>
+        </div>
       )}
 
       {/* Empty state */}

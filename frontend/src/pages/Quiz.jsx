@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 
@@ -11,18 +11,46 @@ export default function Quiz() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const fetchQuiz = useCallback(() => {
+    let cancelled = false;
+
+    setLoading(true);
+    setError("");
+    setQuiz(null);
+
     api
       .get(`/quizzes/${id}`)
-      .then((res) => setQuiz(res.data.data))
-      .catch((err) => {
-        setError(
-          err.response?.data?.message ||
-            "Unable to load this quiz. Please try again."
-        );
+      .then((res) => {
+        if (!cancelled) setQuiz(res.data.data);
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) {
+          setError(
+            err.response?.data?.message ||
+              "Unable to load this quiz. Please try again."
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  useEffect(() => {
+    let cleanup;
+    const timeoutId = setTimeout(() => {
+      cleanup = fetchQuiz();
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      cleanup?.();
+    };
+  }, [fetchQuiz]);
 
   const selectAnswer = (questionId, option) => {
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
@@ -53,10 +81,18 @@ export default function Quiz() {
   if (error && !quiz) {
     return (
       <div className="p-8">
-        <p className="text-red-600">{error}</p>
-        <Link to="/" className="text-blue-600 hover:underline text-sm">
-          ← Back to courses
-        </Link>
+        <p className="text-red-600 mb-3">{error}</p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={fetchQuiz}
+            className="text-sm font-medium text-blue-600 underline"
+          >
+            Retry
+          </button>
+          <Link to="/" className="text-blue-600 hover:underline text-sm">
+            ← Back to courses
+          </Link>
+        </div>
       </div>
     );
   }

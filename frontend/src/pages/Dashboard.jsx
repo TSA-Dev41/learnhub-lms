@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
@@ -9,13 +9,22 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const fetchEnrollments = useCallback(() => {
+    setLoading(true);
+    setError("");
+
     api
       .get("/enrollments/me")
       .then((res) => setEnrollments(res.data.data))
       .catch(() => setError("Unable to load your courses. Please try again."))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(fetchEnrollments, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchEnrollments]);
 
   return (
     <div className="min-h-screen p-8 max-w-5xl mx-auto">
@@ -32,7 +41,15 @@ export default function Dashboard() {
       )}
 
       {!loading && error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded">{error}</p>
+        <div className="bg-red-100 text-red-700 p-3 rounded flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button
+            onClick={fetchEnrollments}
+            className="text-sm font-medium underline shrink-0"
+          >
+            Retry
+          </button>
+        </div>
       )}
 
       {!loading && !error && enrollments.length === 0 && (

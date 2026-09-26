@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 
@@ -7,6 +7,21 @@ export default function QuizResult() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const fetchResult = useCallback(() => {
+    setLoading(true);
+    setError("");
+
+    api
+      .get(`/quizzes/${id}/result`)
+      .then((res) => setResult(res.data.data))
+      .catch((err) => {
+        setError(
+          err.response?.data?.message || "Unable to load your result."
+        );
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
 
   useEffect(() => {
     api
@@ -25,10 +40,18 @@ export default function QuizResult() {
   if (error) {
     return (
       <div className="p-8">
-        <p className="text-red-600">{error}</p>
-        <Link to="/" className="text-blue-600 hover:underline text-sm">
-          ← Back to courses
-        </Link>
+        <p className="text-red-600 mb-3">{error}</p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={fetchResult}
+            className="text-sm font-medium text-blue-600 underline"
+          >
+            Retry
+          </button>
+          <Link to="/" className="text-blue-600 hover:underline text-sm">
+            ← Back to courses
+          </Link>
+        </div>
       </div>
     );
   }
