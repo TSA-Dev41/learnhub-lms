@@ -13,6 +13,7 @@ const quizRoutes = require("./routes/quizRoutes");
 const adminQuizRoutes = require("./routes/adminQuizRoutes");
 const adminQuestionRoutes = require("./routes/adminQuestionRoutes");
 const progressRoutes = require("./routes/progressRoutes");
+const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
 
@@ -37,4 +38,8 @@ app.use("/api/admin/quizzes", adminQuizRoutes);
 app.use("/api/admin/questions", adminQuestionRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/admin/students", require("./routes/adminStudentRoutes"));
+
+app.use(notFound);
+app.use(errorHandler);
+
 module.exports = app;
