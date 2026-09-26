@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -16,54 +16,40 @@ export default function ManageLessons() {
   const { id: courseId } = useParams();
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const ignoreRef = useRef(false);
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null); // null = creating new
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const fetchLessons = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setLoadError("");
     try {
       const res = await api.get(`/admin/lessons/course/${courseId}`);
-      setLessons(res.data.data);
+      if (!ignoreRef.current) {
+        setLessons(res.data.data);
+      }
     } catch {
-      setError("Unable to load lessons.");
+      if (!ignoreRef.current) {
+        setLoadError("Unable to load lessons.");
+      }
     } finally {
-      setLoading(false);
+      if (!ignoreRef.current) {
+        setLoading(false);
+      }
     }
   }, [courseId]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadLessons = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const res = await api.get(`/admin/lessons/course/${courseId}`);
-        if (isMounted) {
-          setLessons(res.data.data);
-        }
-      } catch {
-        if (isMounted) {
-          setError("Unable to load lessons.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadLessons();
-
+    ignoreRef.current = false;
+    fetchLessons();
     return () => {
-      isMounted = false;
+      ignoreRef.current = true;
     };
-  }, [courseId]);
+  }, [fetchLessons]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -72,6 +58,7 @@ export default function ManageLessons() {
 
   const startEdit = (lesson) => {
     setEditingId(lesson._id);
+    setFormError("");
     setForm({
       title: lesson.title || "",
       description: lesson.description || "",
@@ -85,13 +72,14 @@ export default function ManageLessons() {
 
   const cancelEdit = () => {
     setEditingId(null);
+    setFormError("");
     setForm(emptyForm);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setError("");
+    setFormError("");
     try {
       if (editingId) {
         await api.put(`/admin/lessons/${editingId}`, form);
@@ -101,7 +89,7 @@ export default function ManageLessons() {
       cancelEdit();
       fetchLessons();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to save lesson.");
+      setFormError(err.response?.data?.message || "Unable to save lesson.");
     } finally {
       setSubmitting(false);
     }
@@ -126,13 +114,19 @@ export default function ManageLessons() {
         </Link>
       </div>
 
-      {error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>
-      )}
-
       {/* Lesson list */}
       {loading ? (
         <p className="text-gray-500">Loading lessons...</p>
+      ) : loadError ? (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-8 flex items-center justify-between gap-3">
+          <span>{loadError}</span>
+          <button
+            onClick={fetchLessons}
+            className="text-sm font-medium underline shrink-0"
+          >
+            Retry
+          </button>
+        </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
           <table className="w-full text-sm">
@@ -195,6 +189,11 @@ export default function ManageLessons() {
         <h2 className="text-lg font-bold mb-4">
           {editingId ? "Edit Lesson" : "Add New Lesson"}
         </h2>
+
+        {formError && (
+          <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{formError}</p>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Title</label>

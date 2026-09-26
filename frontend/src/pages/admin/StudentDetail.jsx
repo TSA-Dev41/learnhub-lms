@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -11,7 +11,10 @@ export default function StudentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const fetchStudentDetail = useCallback(() => {
+    setLoading(true);
+    setError("");
+
     Promise.all([
       api.get(`/admin/students/${id}`),
       api.get(`/admin/students/${id}/enrollments`),
@@ -26,8 +29,30 @@ export default function StudentDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    fetchStudentDetail();
+  }, [fetchStudentDetail]);
+
   if (loading) return <p className="text-gray-500">Loading...</p>;
-  if (error) return <p className="bg-red-100 text-red-700 p-3 rounded">{error}</p>;
+
+  if (error) {
+    return (
+      <div>
+        <p className="bg-red-100 text-red-700 p-3 rounded mb-3">{error}</p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={fetchStudentDetail}
+            className="text-sm font-medium text-blue-600 underline"
+          >
+            Retry
+          </button>
+          <Link to="/admin/students" className="text-blue-600 hover:underline text-sm">
+            ← Back to Students
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

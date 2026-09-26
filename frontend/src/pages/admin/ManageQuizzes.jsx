@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -22,50 +22,46 @@ export default function ManageQuizzes() {
 
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const ignoreRef = useRef(false);
 
   const [quizForm, setQuizForm] = useState(emptyQuizForm);
   const [editingQuizId, setEditingQuizId] = useState(null);
   const [submittingQuiz, setSubmittingQuiz] = useState(false);
+  const [quizFormError, setQuizFormError] = useState("");
 
   const [activeQuiz, setActiveQuiz] = useState(null); // full quiz+questions being managed
   const [questionForm, setQuestionForm] = useState(emptyQuestionForm);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [submittingQuestion, setSubmittingQuestion] = useState(false);
+  const [questionError, setQuestionError] = useState("");
 
-  const fetchQuizzes = async () => {
+  const fetchQuizzes = useCallback(async () => {
     setLoading(true);
+    setLoadError("");
     try {
       const res = await api.get(`/admin/quizzes/course/${courseId}`);
-      setQuizzes(res.data.data);
+      if (!ignoreRef.current) {
+        setQuizzes(res.data.data);
+      }
     } catch {
-      setError("Unable to load quizzes.");
+      if (!ignoreRef.current) {
+        setLoadError("Unable to load quizzes.");
+      }
     } finally {
-      setLoading(false);
+      if (!ignoreRef.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, [courseId]);
 
   useEffect(() => {
-    let isActive = true;
-
-    const loadQuizzes = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/admin/quizzes/course/${courseId}`);
-        if (isActive) setQuizzes(res.data.data);
-      } catch {
-        if (isActive) setError("Unable to load quizzes.");
-      } finally {
-        if (isActive) setLoading(false);
-      }
-    };
-
-    void loadQuizzes();
-
+    ignoreRef.current = false;
+    fetchQuizzes();
     return () => {
-      isActive = false;
+      ignoreRef.current = true;
     };
-  }, [courseId]);
+  }, [fetchQuizzes]);
 
   // ---- Quiz form ----
   const handleQuizChange = (e) => {
@@ -74,6 +70,7 @@ export default function ManageQuizzes() {
 
   const startEditQuiz = (quiz) => {
     setEditingQuizId(quiz._id);
+    setQuizFormError("");
     setQuizForm({
       title: quiz.title || "",
       description: quiz.description || "",
@@ -85,13 +82,14 @@ export default function ManageQuizzes() {
 
   const cancelEditQuiz = () => {
     setEditingQuizId(null);
+    setQuizFormError("");
     setQuizForm(emptyQuizForm);
   };
 
   const handleQuizSubmit = async (e) => {
     e.preventDefault();
     setSubmittingQuiz(true);
-    setError("");
+    setQuizFormError("");
     try {
       if (editingQuizId) {
         await api.put(`/admin/quizzes/${editingQuizId}`, quizForm);
@@ -101,7 +99,7 @@ export default function ManageQuizzes() {
       cancelEditQuiz();
       fetchQuizzes();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to save quiz.");
+      setQuizFormError(err.response?.data?.message || "Unable to save quiz.");
     } finally {
       setSubmittingQuiz(false);
     }
@@ -120,16 +118,18 @@ export default function ManageQuizzes() {
 
   // ---- Questions ----
   const openQuestionManager = (quizId) => {
+    setQuestionError("");
     api
       .get(`/admin/quizzes/${quizId}`)
       .then((res) => setActiveQuiz(res.data.data))
-      .catch(() => setError("Unable to load quiz questions."));
+      .catch(() => setQuestionError("Unable to load quiz questions."));
   };
 
   const closeQuestionManager = () => {
     setActiveQuiz(null);
     setEditingQuestionId(null);
     setQuestionForm(emptyQuestionForm);
+    setQuestionError("");
   };
 
   const refreshActiveQuiz = () => {
@@ -144,6 +144,7 @@ export default function ManageQuizzes() {
 
   const startEditQuestion = (q) => {
     setEditingQuestionId(q.id);
+    setQuestionError("");
     setQuestionForm({
       text: q.text,
       options: q.options,
@@ -154,13 +155,14 @@ export default function ManageQuizzes() {
 
   const cancelEditQuestion = () => {
     setEditingQuestionId(null);
+    setQuestionError("");
     setQuestionForm(emptyQuestionForm);
   };
 
   const handleQuestionSubmit = async (e) => {
     e.preventDefault();
     setSubmittingQuestion(true);
-    setError("");
+    setQuestionError("");
     try {
       const cleanOptions = questionForm.options.filter((o) => o.trim() !== "");
       const payload = { ...questionForm, options: cleanOptions };
@@ -173,7 +175,7 @@ export default function ManageQuizzes() {
       cancelEditQuestion();
       refreshActiveQuiz();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to save question.");
+      setQuestionError(err.response?.data?.message || "Unable to save question.");
     } finally {
       setSubmittingQuestion(false);
     }
@@ -198,13 +200,19 @@ export default function ManageQuizzes() {
         </Link>
       </div>
 
-      {error && (
-        <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>
-      )}
-
       {/* Quiz list */}
       {loading ? (
         <p className="text-gray-500">Loading quizzes...</p>
+      ) : loadError ? (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-8 flex items-center justify-between gap-3">
+          <span>{loadError}</span>
+          <button
+            onClick={fetchQuizzes}
+            className="text-sm font-medium underline shrink-0"
+          >
+            Retry
+          </button>
+        </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
           <table className="w-full text-sm">
@@ -271,6 +279,11 @@ export default function ManageQuizzes() {
         <h2 className="text-lg font-bold mb-4">
           {editingQuizId ? "Edit Quiz" : "Add New Quiz"}
         </h2>
+
+        {quizFormError && (
+          <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{quizFormError}</p>
+        )}
+
         <form onSubmit={handleQuizSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Title</label>
@@ -371,6 +384,10 @@ export default function ManageQuizzes() {
               Close
             </button>
           </div>
+
+          {questionError && (
+            <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{questionError}</p>
+          )}
 
           <ul className="space-y-2 mb-6">
             {activeQuiz.questions.map((q) => (

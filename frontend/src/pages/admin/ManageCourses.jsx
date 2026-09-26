@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -6,51 +6,36 @@ export default function ManageCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const ignoreRef = useRef(false);
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
+      setError("");
       // Admin sees ALL statuses via the dedicated admin endpoint —
       // no more merging published-only results.
       const res = await api.get("/admin/courses", { params: { limit: 100 } });
-      setCourses(res.data.data);
-      setError("");
+      if (!ignoreRef.current) {
+        setCourses(res.data.data);
+      }
     } catch {
-      setError("Unable to load courses. Please try again.");
+      if (!ignoreRef.current) {
+        setError("Unable to load courses. Please try again.");
+      }
     } finally {
-      setLoading(false);
+      if (!ignoreRef.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
-    let ignore = false;
-
-    const loadCourses = async () => {
-      if (ignore) return;
-      try {
-        setLoading(true);
-        const res = await api.get("/admin/courses", { params: { limit: 100 } });
-        if (!ignore) {
-          setCourses(res.data.data);
-          setError("");
-        }
-      } catch {
-        if (!ignore) {
-          setError("Unable to load courses. Please try again.");
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadCourses();
-
+    ignoreRef.current = false;
+    fetchCourses();
     return () => {
-      ignore = true;
+      ignoreRef.current = true;
     };
-  }, []);
+  }, [fetchCourses]);
 
   const handleStatusChange = async (id, status) => {
     try {
@@ -84,7 +69,18 @@ export default function ManageCourses() {
       </div>
 
       {loading && <p className="text-gray-500">Loading courses...</p>}
-      {error && <p className="bg-red-100 text-red-700 p-3 rounded">{error}</p>}
+
+      {!loading && error && (
+        <div className="bg-red-100 text-red-700 p-3 rounded flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button
+            onClick={fetchCourses}
+            className="text-sm font-medium underline shrink-0"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {!loading && !error && (
         <div className="bg-white rounded-lg shadow overflow-hidden">

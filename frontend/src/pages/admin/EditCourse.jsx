@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -11,13 +11,19 @@ export default function EditCourse() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
+  const fetchCourse = useCallback(() => {
+    setLoading(true);
+    setError("");
     api
       .get(`/admin/courses/${id}`)
       .then((res) => setForm(res.data.data))
       .catch(() => setError("Unable to load course."))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    fetchCourse();
+  }, [fetchCourse]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -46,7 +52,17 @@ export default function EditCourse() {
 
   if (loading) return <p className="text-gray-500">Loading course...</p>;
   if (error && !form)
-    return <p className="bg-red-100 text-red-700 p-3 rounded">{error}</p>;
+    return (
+      <div>
+        <p className="bg-red-100 text-red-700 p-3 rounded mb-3">{error}</p>
+        <button
+          onClick={fetchCourse}
+          className="text-sm font-medium text-blue-600 underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
 
   return (
     <div className="max-w-2xl">
