@@ -34,4 +34,5 @@ app.use("/api/quizzes", quizRoutes);
 app.use("/api/admin/quizzes", adminQuizRoutes);
 app.use("/api/admin/questions", adminQuestionRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/admin/students", require("./routes/adminStudentRoutes"));
 module.exports = app;

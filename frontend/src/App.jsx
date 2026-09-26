@@ -17,6 +17,8 @@ import CreateCourse from "./pages/admin/CreateCourse";
 import EditCourse from "./pages/admin/EditCourse";
 import ManageLessons from "./pages/admin/ManageLessons";
 import ManageQuizzes from "./pages/admin/ManageQuizzes";
+import Students from "./pages/admin/Students";
+import StudentDetail from "./pages/admin/StudentDetail";
 
 function App() {
   return (
@@ -74,6 +76,8 @@ function App() {
           <Route path="courses/:id/edit" element={<EditCourse />} />
           <Route path="courses/:id/lessons" element={<ManageLessons />} />
           <Route path="courses/:id/quizzes" element={<ManageQuizzes />} />
+          <Route path="students" element={<Students />} />
+          <Route path="students/:id" element={<StudentDetail />} />
         </Route>
       </Routes>
     </>

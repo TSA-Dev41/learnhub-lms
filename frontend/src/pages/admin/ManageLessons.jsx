@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../../services/api";
 
@@ -22,17 +22,47 @@ export default function ManageLessons() {
   const [editingId, setEditingId] = useState(null); // null = creating new
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchLessons = () => {
+  const fetchLessons = useCallback(async () => {
     setLoading(true);
-    api
-      .get(`/admin/lessons/course/${courseId}`)
-      .then((res) => setLessons(res.data.data))
-      .catch(() => setError("Unable to load lessons."))
-      .finally(() => setLoading(false));
-  };
+    setError("");
+    try {
+      const res = await api.get(`/admin/lessons/course/${courseId}`);
+      setLessons(res.data.data);
+    } catch {
+      setError("Unable to load lessons.");
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId]);
 
   useEffect(() => {
-    fetchLessons();
+    let isMounted = true;
+
+    const loadLessons = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const res = await api.get(`/admin/lessons/course/${courseId}`);
+        if (isMounted) {
+          setLessons(res.data.data);
+        }
+      } catch {
+        if (isMounted) {
+          setError("Unable to load lessons.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadLessons();
+
+    return () => {
+      isMounted = false;
+    };
   }, [courseId]);
 
   const handleChange = (e) => {

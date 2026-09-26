@@ -33,17 +33,38 @@ export default function ManageQuizzes() {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [submittingQuestion, setSubmittingQuestion] = useState(false);
 
-  const fetchQuizzes = () => {
+  const fetchQuizzes = async () => {
     setLoading(true);
-    api
-      .get(`/admin/quizzes/course/${courseId}`)
-      .then((res) => setQuizzes(res.data.data))
-      .catch(() => setError("Unable to load quizzes."))
-      .finally(() => setLoading(false));
+    try {
+      const res = await api.get(`/admin/quizzes/course/${courseId}`);
+      setQuizzes(res.data.data);
+    } catch {
+      setError("Unable to load quizzes.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchQuizzes();
+    let isActive = true;
+
+    const loadQuizzes = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/admin/quizzes/course/${courseId}`);
+        if (isActive) setQuizzes(res.data.data);
+      } catch {
+        if (isActive) setError("Unable to load quizzes.");
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    };
+
+    void loadQuizzes();
+
+    return () => {
+      isActive = false;
+    };
   }, [courseId]);
 
   // ---- Quiz form ----
