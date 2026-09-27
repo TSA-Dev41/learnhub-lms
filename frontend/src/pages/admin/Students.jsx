@@ -70,8 +70,8 @@ export default function Students() {
       )}
 
       {!loading && !error && (
-        <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="bg-surface rounded-lg shadow-sm overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+          <table className="w-full text-sm min-w-[500px]">
             <thead style={{ background: "var(--color-primary-light)" }}>
               <tr className="text-left">
                 <th className="p-3" style={{ color: "var(--color-text)" }}>Name</th>

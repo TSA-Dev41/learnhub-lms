@@ -154,7 +154,7 @@ export default function ManageLessons() {
         </div>
       ) : (
         <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[600px]">
             <thead style={{ background: "var(--color-primary-light)" }}>
               <tr className="text-left">
                 <th className="p-3" style={{ color: "var(--color-text)" }}>Order</th>

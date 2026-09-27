@@ -98,8 +98,11 @@ export default function StudentDetail() {
       <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
         Enrollments
       </h2>
-      <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
-        <table className="w-full text-sm">
+      <p className="text-xs mb-2 sm:hidden" style={{ color: "var(--color-text-muted)" }}>
+        ← Swipe to see more →
+      </p>
+      <div className="bg-surface rounded-lg shadow-sm overflow-x-auto mb-8" style={{ WebkitOverflowScrolling: "touch" }}>
+        <table className="w-full text-sm min-w-[500px]">
           <thead style={{ background: "var(--color-primary-light)" }}>
             <tr className="text-left">
               <th className="p-3" style={{ color: "var(--color-text)" }}>Course</th>
@@ -136,8 +139,11 @@ export default function StudentDetail() {
       <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
         Completed Lessons
       </h2>
-      <div className="bg-surface rounded-lg shadow-sm overflow-hidden mb-8">
-        <table className="w-full text-sm">
+      <p className="text-xs mb-2 sm:hidden" style={{ color: "var(--color-text-muted)" }}>
+        ← Swipe to see more →
+      </p>
+      <div className="bg-surface rounded-lg shadow-sm overflow-x-auto mb-8" style={{ WebkitOverflowScrolling: "touch" }}>
+        <table className="w-full text-sm min-w-[500px]">
           <thead style={{ background: "var(--color-primary-light)" }}>
             <tr className="text-left">
               <th className="p-3" style={{ color: "var(--color-text)" }}>Lesson</th>
@@ -174,8 +180,11 @@ export default function StudentDetail() {
       <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-text)" }}>
         Quiz Attempts
       </h2>
-      <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+      <p className="text-xs mb-2 sm:hidden" style={{ color: "var(--color-text-muted)" }}>
+        ← Swipe to see more →
+      </p>
+      <div className="bg-surface rounded-lg shadow-sm overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+        <table className="w-full text-sm min-w-[500px]">
           <thead style={{ background: "var(--color-primary-light)" }}>
             <tr className="text-left">
               <th className="p-3" style={{ color: "var(--color-text)" }}>Quiz</th>

@@ -109,93 +109,100 @@ export default function ManageCourses() {
       )}
 
       {!loading && !error && (
-        <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead style={{ background: "var(--color-primary-light)" }}>
-              <tr className="text-left">
-                <th className="p-3" style={{ color: "var(--color-text)" }}>Title</th>
-                <th className="p-3" style={{ color: "var(--color-text)" }}>Category</th>
-                <th className="p-3" style={{ color: "var(--color-text)" }}>Status</th>
-                <th className="p-3" style={{ color: "var(--color-text)" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course) => (
-                <tr key={course._id} className="border-t border-gray-100">
-                  <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
-                    {course.title}
-                  </td>
-                  <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
-                    {course.category}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className="px-2 py-1 rounded-full text-xs capitalize font-medium"
-                      style={statusStyle[course.status]}
-                    >
-                      {course.status}
-                    </span>
-                  </td>
-                  <td className="p-3 space-x-3 text-sm">
-                    <Link
-                      to={`/admin/courses/${course._id}/edit`}
-                      className="hover:underline"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      Edit
-                    </Link>
-                    {course.status !== "published" && (
-                      <button
-                        onClick={() => handleStatusChange(course._id, "published")}
-                        className="hover:underline"
-                        style={{ color: "var(--color-accent)" }}
-                      >
-                        Publish
-                      </button>
-                    )}
-                    {course.status === "published" && (
-                      <button
-                        onClick={() => handleStatusChange(course._id, "archived")}
-                        className="hover:underline"
-                        style={{ color: "var(--color-text-muted)" }}
-                      >
-                        Archive
-                      </button>
-                    )}
-                    <Link
-                      to={`/admin/courses/${course._id}/lessons`}
-                      className="hover:underline"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      Lessons
-                    </Link>
-                    <Link
-                      to={`/admin/courses/${course._id}/quizzes`}
-                      className="hover:underline"
-                      style={{ color: "var(--color-primary)" }}
-                    >
-                      Quizzes
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(course._id)}
-                      className="hover:underline"
-                      style={{ color: "var(--color-danger)" }}
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <>
+          <p className="text-xs mb-2 sm:hidden" style={{ color: "var(--color-text-muted)" }}>
+            ← Swipe to see more →
+          </p>
+          <div className="bg-surface rounded-lg shadow-sm overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+            <table className="w-full text-sm min-w-[600px]">
+              <thead style={{ background: "var(--color-primary-light)" }}>
+                <tr className="text-left">
+                  <th className="p-3" style={{ color: "var(--color-text)" }}>Title</th>
+                  <th className="p-3" style={{ color: "var(--color-text)" }}>Category</th>
+                  <th className="p-3" style={{ color: "var(--color-text)" }}>Status</th>
+                  <th className="p-3" style={{ color: "var(--color-text)" }}>Actions</th>
                 </tr>
-              ))}
-              {courses.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
-                    No courses yet. Create your first one.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {courses.map((course) => (
+                  <tr key={course._id} className="border-t border-gray-100">
+                    <td className="p-3 font-medium" style={{ color: "var(--color-text)" }}>
+                      {course.title}
+                    </td>
+                    <td className="p-3" style={{ color: "var(--color-text-muted)" }}>
+                      {course.category}
+                    </td>
+                    <td className="p-3">
+                      <span
+                        className="px-2 py-1 rounded-full text-xs capitalize font-medium"
+                        style={statusStyle[course.status]}
+                      >
+                        {course.status}
+                      </span>
+                    </td>
+                    <td className="p-3 text-sm">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                        <Link
+                          to={`/admin/courses/${course._id}/edit`}
+                          className="hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                        >
+                          Edit
+                        </Link>
+                        {course.status !== "published" && (
+                          <button
+                            onClick={() => handleStatusChange(course._id, "published")}
+                            className="hover:underline"
+                            style={{ color: "var(--color-accent)" }}
+                          >
+                            Publish
+                          </button>
+                        )}
+                        {course.status === "published" && (
+                          <button
+                            onClick={() => handleStatusChange(course._id, "archived")}
+                            className="hover:underline"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            Archive
+                          </button>
+                        )}
+                        <Link
+                          to={`/admin/courses/${course._id}/lessons`}
+                          className="hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                        >
+                          Lessons
+                        </Link>
+                        <Link
+                          to={`/admin/courses/${course._id}/quizzes`}
+                          className="hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                        >
+                          Quizzes
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(course._id)}
+                          className="hover:underline"
+                          style={{ color: "var(--color-danger)" }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {courses.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="p-6 text-center" style={{ color: "var(--color-text-muted)" }}>
+                      No courses yet. Create your first one.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </motion.div>
   );
