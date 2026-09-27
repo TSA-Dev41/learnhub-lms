@@ -134,7 +134,7 @@ const seed = async () => {
       const course = await Course.create({
         title: def.title,
         description: def.description,
-        instructor: admin._id,
+        instructor: admin.name,
         category: def.category,
         level: def.level,
         thumbnail: `https://picsum.photos/seed/${def.seed}/600/400`,
@@ -165,7 +165,7 @@ const seed = async () => {
     await Course.create({
       title: "Advanced Course Design (Draft)",
       description: "An unfinished course used to test the admin draft/publish workflow.",
-      instructor: admin._id,
+      instructor: admin.name,
       category: "Design",
       level: "advanced",
       thumbnail: `https://picsum.photos/seed/draft-course/600/400`,
