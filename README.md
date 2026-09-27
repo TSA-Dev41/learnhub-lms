@@ -1,19 +1,24 @@
 # LearnHub
 
-A full-stack Learning Management System (LMS) built solo as a capstone-style project. Students can browse courses, enroll, complete lessons, and take quizzes; admins can manage courses, lessons, quizzes, and view student progress.
+A full-stack Learning Management System (LMS) — students browse courses, enroll, work through lessons, and take quizzes; admins manage all course content and track student progress. Built as a TSAcademy capstone project.
+
+**Live demo:** https://frontend-tau-gold-mvcfkz0a1a.vercel.app
+**API:** https://learnhub-lms-ix25.onrender.com/api
+
+> The backend runs on Render's free tier, which spins down after periods of inactivity — the first request after a quiet spell may take 30–60 seconds to respond while it wakes up. Subsequent requests are fast.
 
 ## Features
 
-**Student-facing**
-- Browse a public course catalogue with search, category filtering, and pagination
-- Enroll in courses
-- View lesson content (video + text), mark lessons complete
-- Take quizzes and view scored results with answer review
-- Personal dashboard showing enrolled courses and progress
+**Public / student-facing**
+- Landing page with featured courses, and a full searchable/filterable/paginated course catalogue
+- Course enrollment, structured lessons with completion tracking, and scored quizzes with instant, detailed feedback
+- Personal dashboard showing every enrolled course and progress at a glance
+- About and Contact pages
+- A built-in assistant widget — answers common questions and can search live course data, entirely client-side (no external AI service, no API cost)
 
 **Admin panel**
 - Full CRUD for courses, lessons, quizzes, and quiz questions
-- Publish/archive workflow for courses (draft → published → archived)
+- Publish/draft/archive workflow for courses
 - Student directory with per-student enrollment and progress detail
 
 **Under the hood**
@@ -21,13 +26,16 @@ A full-stack Learning Management System (LMS) built solo as a capstone-style pro
 - Centralized error handling with consistent API response shapes
 - Rate limiting on auth routes, security headers via Helmet
 - Seed script for reproducible demo data
+- A custom design system (typography, color palette, motion) applied consistently across the whole app
 
 ## Tech Stack
 
 **Backend:** Node.js, Express, MongoDB (Atlas), Mongoose, JWT, bcryptjs
-**Frontend:** React (Vite), Tailwind CSS v4, React Router, Axios
+**Frontend:** React (Vite), Tailwind CSS v4, React Router, Axios, Framer Motion
 
-## Getting Started
+**Deployed on:** Vercel (frontend) + Render (backend) + MongoDB Atlas (database) — all free tier.
+
+## Running Locally
 
 ### Prerequisites
 - Node.js (v18+ recommended)
@@ -47,7 +55,7 @@ cd backend
 npm install
 ```
 
-Create a `backend/.env` file (see `backend/.env.example`):
+Create a `backend/.env` file (see `backend/.env.example`). **Create it with a text editor or a bash heredoc — typing the content into a raw shell command can cause the shell to misinterpret parts of it and silently fail to create the file correctly.**
 
 ```
 PORT=5001
@@ -56,9 +64,9 @@ JWT_SECRET=<a long random string>
 CLIENT_URL=http://localhost:5173
 ```
 
-> **Note:** the backend runs on port **5001**, not 5000 — port 5000 conflicts with the macOS AirPlay Receiver and causes a misleading `403 Access denied` error.
+> The backend runs on port **5001**, not 5000 — port 5000 conflicts with the macOS AirPlay Receiver and causes a misleading `403 Access denied` error.
 
-Seed the database with demo data (test accounts, a sample course, lesson, and quiz):
+Seed the database with demo data (test accounts, 9 sample courses with images, lessons, and a quiz):
 
 ```bash
 npm run seed
@@ -70,7 +78,7 @@ Start the backend:
 npm run dev
 ```
 
-The API will be running at `http://localhost:5001`.
+The API runs at `http://localhost:5001`.
 
 ### 3. Frontend setup
 
@@ -79,7 +87,7 @@ cd ../frontend
 npm install
 ```
 
-Create a `frontend/.env` file (see `frontend/.env.example`):
+Create a `frontend/.env` file:
 
 ```
 VITE_API_URL=http://localhost:5001/api
@@ -91,11 +99,11 @@ Start the frontend:
 npm run dev
 ```
 
-The app will be running at `http://localhost:5173`.
+The app runs at `http://localhost:5173`.
 
 ### Test accounts
 
-After running `npm run seed`, the following accounts are available:
+After running `npm run seed`:
 
 | Role | Email | Password |
 |---|---|---|
@@ -107,10 +115,13 @@ After running `npm run seed`, the following accounts are available:
 
 ```
 learnhub-lms/
+├── docs/
+│   ├── API-CONTRACT.md    # API request/response reference
+│   └── DEVELOPMENT.md     # development notes
 ├── backend/
 │   └── src/
-│       ├── config/        # Database connection
-│       ├── models/        # Mongoose schemas (User, Course, Lesson, Quiz, etc.)
+│       ├── config/         # Database connection
+│       ├── models/         # Mongoose schemas
 │       ├── controllers/    # Route handlers
 │       ├── middleware/     # Auth, enrollment checks, rate limiting, error handling
 │       ├── routes/         # Express routers
@@ -118,16 +129,17 @@ learnhub-lms/
 │       └── utils/          # Token generation, async handler
 └── frontend/
     └── src/
-        ├── components/     # Shared UI (Navbar, route guards, course cards)
+        ├── components/     # Navbar, Footer, Logo, Chatbot, route guards, CourseCard
         ├── context/         # AuthContext
-        ├── pages/           # Route-level pages (Catalogue, Dashboard, Lesson, Quiz, etc.)
+        ├── data/            # Chatbot response/matching logic
+        ├── pages/           # Home, Catalogue, CourseDetails, Lesson, Quiz, Dashboard, About, Contact, etc.
         │   └── admin/       # Admin panel pages
         └── services/        # Axios API client
 ```
 
 ## API Overview
 
-All routes are prefixed with `/api`. Admin routes require a valid JWT for a user with `role: "admin"`.
+All routes are prefixed with `/api`. Admin routes require a valid JWT for a user with `role: "admin"`. See `docs/API-CONTRACT.md` for the full request/response reference.
 
 | Area | Public routes | Protected / Admin routes |
 |---|---|---|
@@ -145,21 +157,13 @@ All responses follow a consistent shape:
 { "success": true, "message": "...", "data": { ... } }
 ```
 
-## Contributing
+## Deployment
 
-This project is built solo, but the frontend is open to redesign contributions.
+- **Frontend:** Vercel, deployed from `frontend/` via the Vercel CLI (`vercel --prod`)
+- **Backend:** Render, deployed from `backend/`, connected to the `main` branch for auto-deploys on push
+- **Database:** MongoDB Atlas (shared between local development and the deployed app)
 
-- Branch off `feature/fullstack-integration` (the main working branch — **not** `main`)
-- Only the `frontend/` folder needs to be touched
-- Keep API calls functionally equivalent to what's documented above — the backend doesn't care what the UI looks like, only that requests/responses match
-- Open PRs against `feature/fullstack-integration`
-
-## Roadmap
-
-This project is in its final phase. Remaining/optional work:
-- Deployment (backend → Render/Railway, frontend → Vercel/Netlify)
-- Swagger/OpenAPI documentation
-- A dedicated visual design pass (typography, color, spacing, light animation) across the whole frontend
+Environment variables are set directly in each platform's dashboard rather than committed to the repo.
 
 ## License
 
