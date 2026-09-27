@@ -11,7 +11,7 @@ const navItems = [
 ];
 
 const SidebarContent = ({ onNavigate }) => (
-  <div className="flex flex-col h-full">
+  <div className="flex flex-col h-full min-h-0">
     <div className="mb-6 px-1">
       <Logo />
       <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
@@ -19,7 +19,7 @@ const SidebarContent = ({ onNavigate }) => (
       </p>
     </div>
 
-    <nav className="space-y-1 flex-1">
+    <nav className="space-y-1 flex-1 overflow-y-auto">
       {navItems.map((item) => (
         <NavLink key={item.path} to={item.path} end={item.end} onClick={onNavigate}>
           {({ isActive }) => (
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.2 }}
-              className="fixed top-0 left-0 h-full w-64 p-4 shadow-md z-50 flex flex-col md:hidden"
+              className="fixed top-0 left-0 h-full w-64 max-w-[80vw] p-4 shadow-md z-50 flex flex-col md:hidden overflow-hidden"
               style={{ background: "var(--color-surface)" }}
             >
               <button
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
         <SidebarContent />
       </aside>
 
-      <main className="flex-1 p-4 sm:p-8">
+      <main className="flex-1 p-4 sm:p-8 min-w-0">
         <Outlet />
       </main>
     </div>
