@@ -11,7 +11,7 @@ const navItems = [
 ];
 
 const SidebarContent = ({ onNavigate }) => (
-  <>
+  <div className="flex flex-col h-full">
     <div className="mb-6 px-1">
       <Logo />
       <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
@@ -46,7 +46,7 @@ const SidebarContent = ({ onNavigate }) => (
         ← Home
       </span>
     </NavLink>
-  </>
+  </div>
 );
 
 export default function AdminDashboard() {
