@@ -4,7 +4,6 @@ import Logo from "./Logo";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-
   const navLinkClass =
     "text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors";
 
@@ -14,6 +13,9 @@ export default function Navbar() {
       <div className="flex items-center gap-5">
         <Link to="/" className={navLinkClass}>
           Courses
+        </Link>
+        <Link to="/faq" className={navLinkClass}>
+          FAQ
         </Link>
         {user ? (
           <>

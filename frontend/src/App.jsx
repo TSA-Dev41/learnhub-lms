@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Catalogue from "./pages/Catalogue";
+import FAQ from "./pages/FAQ";
+import Chatbot from "./components/chatbot"; 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import CourseDetails from "./pages/CourseDetails";
@@ -37,6 +39,7 @@ function App() {
         />
         <Route path="/courses" element={<Catalogue />} />
         <Route path="/courses/:id" element={<CourseDetails />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/" element={<Catalogue />} />
         <Route
           path="/lessons/:id"
@@ -80,6 +83,7 @@ function App() {
           <Route path="students/:id" element={<StudentDetail />} />
         </Route>
       </Routes>
+      <Chatbot />
     </>
   );
 }
