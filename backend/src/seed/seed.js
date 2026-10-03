@@ -31,6 +31,7 @@ const seed = async () => {
     const admin = await User.create({
       name: "Chris Admin",
       email: "chris@example.com",
+      phone: "+1 555 100 0001",
       password: "password123",
       role: "admin",
     });
@@ -38,6 +39,7 @@ const seed = async () => {
     const student = await User.create({
       name: "Demo Student",
       email: "student@example.com",
+      phone: "+1 555 100 0002",
       password: "password123",
       role: "student",
     });
@@ -45,6 +47,7 @@ const seed = async () => {
     const outsider = await User.create({
       name: "Outsider Student",
       email: "outsider@example.com",
+      phone: "+1 555 100 0003",
       password: "password123",
       role: "student",
     });
