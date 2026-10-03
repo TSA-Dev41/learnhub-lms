@@ -53,8 +53,8 @@ This is the single source of truth for every backend endpoint. Frontend builds a
 
 ### `POST /api/auth/register`
 - Auth: none
-- Body: `{ "name": "string", "email": "string", "password": "string" }`
-- Success 201: `{ success: true, message: "User registered successfully", data: { user: {id, name, email, role}, token } }`
+- Body: `{ "name": "string", "email": "string", "phone": "string" "password": "string" }`
+- Success 201: `{ success: true, message: "User registered successfully", data: { user: {id, name, email, phone, role}, token } }`
 - Errors: 400 (validation, duplicate email)
 
 ### `POST /api/auth/login`
