@@ -31,6 +31,9 @@ export default function Navbar() {
             <Link to="/dashboard" className={navLinkClass}>
               Dashboard
             </Link>
+            <Link to="/profile" className={navLinkClass}>
+              Profile
+            </Link>
             {user.role === "admin" && (
               <Link to="/admin" className={navLinkClass}>
                 Admin Panel
@@ -89,6 +92,9 @@ export default function Navbar() {
               <>
                 <Link to="/dashboard" className={navLinkClass} onClick={closeMenu}>
                   Dashboard
+                </Link>
+                <Link to="/profile" className={navLinkClass} onClick={closeMenu}>
+                  Profile
                 </Link>
                 {user.role === "admin" && (
                   <Link to="/admin" className={navLinkClass} onClick={closeMenu}>

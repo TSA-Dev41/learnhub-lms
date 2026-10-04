@@ -101,8 +101,25 @@ export default function Dashboard() {
                   {e.title}
                 </h3>
                 <p className="text-sm capitalize" style={{ color: "var(--color-text-muted)" }}>
-                  {e.status}
+                  {e.level || e.status}
                 </p>
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-text-muted)" }}>
+                    <span>
+                      {e.completedLessons || 0} of {e.totalLessons || 0} lessons
+                    </span>
+                    <span>{e.progressPercent || 0}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${e.progressPercent || 0}%`,
+                        background: "var(--color-primary)",
+                      }}
+                    />
+                  </div>
+                </div>
                 <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
                   Enrolled {new Date(e.enrolledAt).toLocaleDateString()}
                 </p>

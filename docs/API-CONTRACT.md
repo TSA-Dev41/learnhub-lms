@@ -259,3 +259,25 @@ This is the single source of truth for every backend endpoint. Frontend builds a
 | 500 | Server Error | unexpected failure |
 
 ---
+## Added endpoints
+
+### GET /api/users/profile
+Auth required. Returns id, name, email, phone, role, createdAt.
+
+### PUT /api/users/profile
+Auth required. Body may include name, email, phone, currentPassword, newPassword.
+
+### POST /api/contact
+Public. Body: name, email, message.
+
+### GET /api/admin/messages
+Admin. Returns saved contact messages.
+
+### PATCH /api/admin/messages/:id/read
+Admin. Marks one message as read.
+
+### GET /api/admin/enrollments
+Admin. Paginated enrollment list with progressPercent.
+
+### GET /api/admin/stats
+Admin. Counts for courses, students, enrollments, quiz attempts, and unread messages.

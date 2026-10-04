@@ -13,6 +13,11 @@ const quizRoutes = require("./routes/quizRoutes");
 const adminQuizRoutes = require("./routes/adminQuizRoutes");
 const adminQuestionRoutes = require("./routes/adminQuestionRoutes");
 const progressRoutes = require("./routes/progressRoutes");
+const userRoutes = require("./routes/userRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+const adminEnrollmentRoutes = require("./routes/adminEnrollmentRoutes");
+const adminMessageRoutes = require("./routes/adminMessageRoutes");
+const adminStatsRoutes = require("./routes/adminStatsRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
@@ -38,6 +43,11 @@ app.use("/api/admin/quizzes", adminQuizRoutes);
 app.use("/api/admin/questions", adminQuestionRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/admin/students", require("./routes/adminStudentRoutes"));
+app.use("/api/users", userRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/admin/enrollments", adminEnrollmentRoutes);
+app.use("/api/admin/messages", adminMessageRoutes);
+app.use("/api/admin/stats", adminStatsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
