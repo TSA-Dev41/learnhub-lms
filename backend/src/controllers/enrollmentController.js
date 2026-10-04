@@ -1,9 +1,10 @@
 const Enrollment = require("../models/Enrollment");
 const Course = require("../models/Course");
+const Lesson = require("../models/Lesson");
+const LessonProgress = require("../models/LessonProgress");
 const asyncHandler = require("../utils/asyncHandler");
 
 // @route  POST /api/courses/:id/enroll
-// Student only (any logged-in user)
 exports.enrollInCourse = asyncHandler(async (req, res) => {
   const courseId = req.params.id;
 
@@ -51,14 +52,36 @@ exports.getMyEnrollments = asyncHandler(async (req, res) => {
     "title thumbnail category level status"
   );
 
-  const data = enrollments.map((e) => ({
-    enrollmentId: e._id,
-    courseId: e.course._id,
-    title: e.course.title,
-    thumbnail: e.course.thumbnail,
-    status: e.status,
-    enrolledAt: e.createdAt,
-  }));
+  const data = await Promise.all(
+    enrollments.map(async (e) => {
+      const courseId = e.course?._id;
+      const totalLessons = courseId
+        ? await Lesson.countDocuments({ course: courseId, published: true })
+        : 0;
+      const completedLessons = courseId
+        ? await LessonProgress.countDocuments({
+            user: req.user._id,
+            course: courseId,
+          })
+        : 0;
+      const progressPercent =
+        totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+      return {
+        enrollmentId: e._id,
+        courseId,
+        title: e.course?.title || "Course unavailable",
+        thumbnail: e.course?.thumbnail || "",
+        category: e.course?.category || "",
+        level: e.course?.level || "",
+        status: e.status,
+        enrolledAt: e.createdAt,
+        completedLessons,
+        totalLessons,
+        progressPercent,
+      };
+    })
+  );
 
   res.status(200).json({
     success: true,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, MessageCircle, Clock } from "lucide-react";
+import api from "../services/api";
 
 const inputClass =
   "w-full rounded-lg px-3 py-2 border border-gray-200 bg-[var(--color-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-shadow";
@@ -8,28 +9,37 @@ const labelClass = "block text-sm font-medium mb-1";
 
 const infoItems = [
   { icon: Mail, title: "Email", text: "support@learnhub.example" },
-  { icon: MessageCircle, title: "Response time", text: "Usually within 1–2 business days" },
-  { icon: Clock, title: "Hours", text: "Mon–Fri, 9am–5pm" },
+  { icon: MessageCircle, title: "Response time", text: "Usually within 1-2 business days" },
+  { icon: Clock, title: "Hours", text: "Mon-Fri, 9am-5pm" },
 ];
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // No backend endpoint exists for this yet — this simulates a successful
-    // submission for demo purposes.
-    setSubmitted(true);
+    setError("");
+    setSending(true);
+
+    try {
+      await api.post("/contact", form);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not send your message. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
       <section
         className="px-8 py-16 text-center"
         style={{
@@ -49,7 +59,6 @@ export default function Contact() {
 
       <section className="max-w-4xl mx-auto px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          {/* Info column */}
           <div className="md:col-span-2 space-y-5">
             {infoItems.map(({ icon: Icon, title, text }) => (
               <div key={title} className="flex gap-3">
@@ -71,7 +80,6 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* Form column */}
           <div className="md:col-span-3">
             {submitted ? (
               <motion.div
@@ -133,11 +141,17 @@ export default function Contact() {
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   type="submit"
-                  className="w-full text-white px-5 py-2.5 rounded-lg font-medium transition-colors"
+                  disabled={sending}
+                  className="w-full text-white px-5 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-60"
                   style={{ background: "var(--color-primary)" }}
                 >
-                  Send Message
+                  {sending ? "Sending..." : "Send Message"}
                 </motion.button>
+                {error && (
+                  <p className="text-sm" style={{ color: "var(--color-danger)" }}>
+                    {error}
+                  </p>
+                )}
               </form>
             )}
           </div>

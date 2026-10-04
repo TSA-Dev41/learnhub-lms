@@ -23,6 +23,9 @@ import Students from "./pages/admin/Students";
 import StudentDetail from "./pages/admin/StudentDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Profile from "./pages/Profile";
+import Enrollments from "./pages/admin/Enrollments";
+import Messages from "./pages/admin/Messages";
 import Chatbot from "./components/Chatbot";
 
 function App() {
@@ -44,6 +47,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
@@ -89,6 +100,8 @@ function App() {
             <Route path="courses/:id/quizzes" element={<ManageQuizzes />} />
             <Route path="students" element={<Students />} />
             <Route path="students/:id" element={<StudentDetail />} />
+            <Route path="enrollments" element={<Enrollments />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
         </Routes>
       </div>

@@ -8,6 +8,8 @@ const navItems = [
   { path: "/admin", label: "Overview", end: true },
   { path: "/admin/courses", label: "Manage Courses" },
   { path: "/admin/students", label: "Students" },
+  { path: "/admin/enrollments", label: "Enrollments" },
+  { path: "/admin/messages", label: "Messages" },
 ];
 
 const SidebarContent = ({ onNavigate }) => (
