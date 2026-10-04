@@ -2,6 +2,7 @@ const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
 const QuizAttempt = require("../models/QuizAttempt");
 const Enrollment = require("../models/Enrollment");
+const achievementService = require("../services/achievementService");
 const asyncHandler = require("../utils/asyncHandler");
 
 // @route  GET /api/quizzes/:id
@@ -137,6 +138,16 @@ exports.submitQuiz = asyncHandler(async (req, res) => {
     passed,
   });
 
+  const newAchievements = [];
+  if (passed && req.user.role === "student") {
+    const firstPassedQuiz = await achievementService.awardAchievement(
+      req.user._id,
+      "first_quiz_passed",
+      { quizId: quiz._id, score: scorePercent }
+    );
+    if (firstPassedQuiz) newAchievements.push(firstPassedQuiz);
+  }
+
   res.status(200).json({
     success: true,
     message: "Quiz submitted successfully",
@@ -145,6 +156,7 @@ exports.submitQuiz = asyncHandler(async (req, res) => {
       totalPoints,
       passed,
       attemptId: attempt._id,
+      newAchievements,
     },
   });
 });
