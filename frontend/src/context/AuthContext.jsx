@@ -8,7 +8,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("token")));
 
-  // On app load, check if a token exists and fetch the current user
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -33,8 +32,8 @@ export function AuthProvider({ children }) {
     return user;
   };
 
-  const register = async (name, email, password) => {
-    const res = await api.post("/auth/register", { name, email, password });
+  const register = async (name, email, phone, password) => {
+    const res = await api.post("/auth/register", { name, email, phone, password });
     const { user, token } = res.data.data;
     localStorage.setItem("token", token);
     setUser(user);
@@ -46,8 +45,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (nextUser) => {
+    setUser((current) => ({ ...current, ...nextUser }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register(name, email, password);
+      await register(name, email, phone, password);
       navigate("/dashboard");
     } catch (err) {
       setError(
@@ -56,6 +57,15 @@ export default function Register() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full border rounded px-3 py-2 mb-4"
+        />
+
+        <label className="block mb-2 text-sm font-medium">Phone Number</label>
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           required
           className="w-full border rounded px-3 py-2 mb-4"
         />
