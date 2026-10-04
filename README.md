@@ -13,6 +13,7 @@ A full-stack Learning Management System (LMS) — students browse courses, enrol
 - Landing page with featured courses, and a full searchable/filterable/paginated course catalogue
 - Course enrollment, structured lessons with completion tracking, and scored quizzes with instant, detailed feedback
 - Personal dashboard showing every enrolled course and progress at a glance
+- Achievement badges and points for completing lessons, courses, and quizzes
 - About and Contact pages
 - A built-in assistant widget — answers common questions and can search live course data, entirely client-side (no external AI service, no API cost)
 
@@ -70,6 +71,13 @@ Seed the database with demo data (test accounts, 9 sample courses with images, l
 
 ```bash
 npm run seed
+```
+
+For an existing database that already has user data, update only the achievement
+catalog without deleting anything:
+
+```bash
+npm run seed:achievements
 ```
 
 Start the backend:
@@ -144,6 +152,7 @@ All routes are prefixed with `/api`. Admin routes require a valid JWT for a user
 | Area | Public routes | Protected / Admin routes |
 |---|---|---|
 | Auth | `POST /auth/register`, `POST /auth/login` | `GET /auth/me` |
+| Achievements | `GET /achievements` | `GET /achievements/me` |
 | Courses | `GET /courses`, `GET /courses/:id`, `GET /courses/categories` | `POST/PUT/DELETE /admin/courses`, `PATCH /admin/courses/:id/status` |
 | Lessons | `GET /courses/:id/lessons` | `GET /lessons/:id`, `POST /lessons/:id/complete`, full CRUD under `/admin/lessons` |
 | Quizzes | `GET /courses/:id/quizzes` | `GET /quizzes/:id`, `POST /quizzes/:id/submit`, `GET /quizzes/:id/result`, full CRUD under `/admin/quizzes` |
@@ -156,6 +165,9 @@ All responses follow a consistent shape:
 ```json
 { "success": true, "message": "...", "data": { ... } }
 ```
+
+Students earn milestone achievements automatically. Run `npm test` from the
+`backend/` directory for the backend unit tests.
 
 ## Deployment
 

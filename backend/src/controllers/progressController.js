@@ -3,11 +3,13 @@ const Lesson = require("../models/Lesson");
 const Enrollment = require("../models/Enrollment");
 const QuizAttempt = require("../models/QuizAttempt");
 const Quiz = require("../models/Quiz");
+const achievementService = require("../services/achievementService");
 const asyncHandler = require("../utils/asyncHandler");
 
 // @route  POST /api/lessons/:id/complete
 exports.markLessonComplete = asyncHandler(async (req, res) => {
   const lesson = req.lesson;
+  const newAchievements = [];
 
   const existing = await LessonProgress.findOne({
     user: req.user._id,
@@ -34,10 +36,32 @@ exports.markLessonComplete = asyncHandler(async (req, res) => {
   const progressPercent =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
+  if (req.user.role === "student") {
+    const firstLesson = await achievementService.awardAchievement(
+      req.user._id,
+      "first_lesson",
+      { lessonId: lesson._id, courseId: lesson.course }
+    );
+    if (firstLesson) newAchievements.push(firstLesson);
+
+    if (totalLessons > 0 && completedLessons >= totalLessons) {
+      const firstCourse = await achievementService.awardAchievement(
+        req.user._id,
+        "first_course_completed",
+        { courseId: lesson.course }
+      );
+      if (firstCourse) newAchievements.push(firstCourse);
+    }
+  }
+
   res.status(200).json({
     success: true,
     message: "Lesson marked complete",
-    data: { lessonId: lesson._id, courseProgressPercent: progressPercent },
+    data: {
+      lessonId: lesson._id,
+      courseProgressPercent: progressPercent,
+      newAchievements,
+    },
   });
 });
 

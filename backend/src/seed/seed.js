@@ -10,6 +10,10 @@ const Question = require("../models/Question");
 const Enrollment = require("../models/Enrollment");
 const LessonProgress = require("../models/LessonProgress");
 const QuizAttempt = require("../models/QuizAttempt");
+const Achievement = require("../models/Achievement");
+const UserAchievement = require("../models/UserAchievement");
+const achievementCatalog = require("../achievements/catalog");
+const achievementService = require("../services/achievementService");
 
 const seed = async () => {
   try {
@@ -25,7 +29,18 @@ const seed = async () => {
       Enrollment.deleteMany({}),
       LessonProgress.deleteMany({}),
       QuizAttempt.deleteMany({}),
+      UserAchievement.deleteMany({}),
     ]);
+
+    await Promise.all(
+      achievementCatalog.map((achievement) =>
+        Achievement.updateOne(
+          { key: achievement.key },
+          { $set: achievement },
+          { upsert: true }
+        )
+      )
+    );
 
     console.log("Creating users...");
     const admin = await User.create({
@@ -229,6 +244,20 @@ const seed = async () => {
       score: 100,
       totalPoints: 100,
       passed: true,
+    });
+
+    await achievementService.awardAchievement(student._id, "first_lesson", {
+      lessonId: jsCourseEntry.lessons[0]._id,
+      courseId: jsCourseEntry.course._id,
+    });
+    await achievementService.awardAchievement(
+      student._id,
+      "first_course_completed",
+      { courseId: jsCourseEntry.course._id }
+    );
+    await achievementService.awardAchievement(student._id, "first_quiz_passed", {
+      quizId: quiz._id,
+      score: 100,
     });
 
     console.log("✅ Seed complete.");

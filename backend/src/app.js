@@ -13,6 +13,10 @@ const quizRoutes = require("./routes/quizRoutes");
 const adminQuizRoutes = require("./routes/adminQuizRoutes");
 const adminQuestionRoutes = require("./routes/adminQuestionRoutes");
 const progressRoutes = require("./routes/progressRoutes");
+<<<<<<< HEAD
+=======
+const achievementRoutes = require("./routes/achievementRoutes");
+>>>>>>> origin/feature/achievement-mvp
 const userRoutes = require("./routes/userRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminEnrollmentRoutes = require("./routes/adminEnrollmentRoutes");
@@ -42,6 +46,7 @@ app.use("/api/quizzes", quizRoutes);
 app.use("/api/admin/quizzes", adminQuizRoutes);
 app.use("/api/admin/questions", adminQuestionRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/achievements", achievementRoutes);
 app.use("/api/admin/students", require("./routes/adminStudentRoutes"));
 app.use("/api/users", userRoutes);
 app.use("/api/contact", contactRoutes);

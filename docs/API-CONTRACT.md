@@ -215,6 +215,29 @@ This is the single source of truth for every backend endpoint. Frontend builds a
 
 ---
 
+## Achievements
+
+Achievements are awarded automatically to students for milestones. Awards are
+one-time per user and are safe to retry.
+
+### `GET /api/achievements`
+- Auth: none
+- Success 200: `data: [{ id, key, name, description, points }]`
+
+### `GET /api/achievements/me`
+- Auth: required
+- Success 200: `{ achievements: [{ id, key, name, description, points, awardedAt, metadata }], totalPoints }`
+- Errors: 401
+
+The initial milestones are completing a first lesson, completing every published
+lesson in a first course, and passing a first quiz. Lesson completion and quiz
+submission responses include `newAchievements`, an array of badges earned by
+that action. To initialize or update the catalog in an existing database, run
+`npm run seed:achievements` from `backend/`; this command does not delete user
+data.
+
+---
+
 ## Admin — Students & Enrollments
 
 ### `GET /api/admin/students`
