@@ -13,10 +13,7 @@ const quizRoutes = require("./routes/quizRoutes");
 const adminQuizRoutes = require("./routes/adminQuizRoutes");
 const adminQuestionRoutes = require("./routes/adminQuestionRoutes");
 const progressRoutes = require("./routes/progressRoutes");
-<<<<<<< HEAD
-=======
 const achievementRoutes = require("./routes/achievementRoutes");
->>>>>>> origin/feature/achievement-mvp
 const userRoutes = require("./routes/userRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminEnrollmentRoutes = require("./routes/adminEnrollmentRoutes");
