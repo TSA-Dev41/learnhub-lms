@@ -16,6 +16,7 @@ A full-stack Learning Management System (LMS) — students browse courses, enrol
 - Achievement badges and points for completing lessons, courses, and quizzes
 - About and Contact pages
 - A built-in assistant widget — answers common questions and can search live course data, entirely client-side (no external AI service, no API cost)
+- Added profile read and update, a real contact form with an admin inbox, the admin enrollment list, lesson progress on the student dashboard, and a live admin overview.
 
 **Admin panel**
 - Full CRUD for courses, lessons, quizzes, and quiz questions
@@ -180,6 +181,3 @@ Environment variables are set directly in each platform's dashboard rather than 
 ## License
 
 This project was built as a personal capstone project and does not currently carry an open-source license.
-## Work added by Orshengnudor Ahzoji
-
-Added profile read and update, a real contact form with an admin inbox, the admin enrollment list, lesson progress on the student dashboard, and a live admin overview.
