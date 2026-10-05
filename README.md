@@ -169,6 +169,8 @@ All responses follow a consistent shape:
 Students earn milestone achievements automatically. Run `npm test` from the
 `backend/` directory for the backend unit tests.
 
+Added profile read and update, a real contact form with an admin inbox, the admin enrollment list, lesson progress on the student dashboard, and a live admin overview.
+
 ## Deployment
 
 - **Frontend:** Vercel, deployed from `frontend/` via the Vercel CLI (`vercel --prod`)
@@ -180,6 +182,5 @@ Environment variables are set directly in each platform's dashboard rather than 
 ## License
 
 This project was built as a personal capstone project and does not currently carry an open-source license.
-## Work added by Orshengnudor Ahzoji
 
-Added profile read and update, a real contact form with an admin inbox, the admin enrollment list, lesson progress on the student dashboard, and a live admin overview.
+
