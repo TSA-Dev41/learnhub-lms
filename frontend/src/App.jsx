@@ -27,6 +27,7 @@ import Profile from "./pages/Profile";
 import Enrollments from "./pages/admin/Enrollments";
 import Messages from "./pages/admin/Messages";
 import Chatbot from "./components/Chatbot";
+import FAQ from "./pages/FAQ";
 
 function App() {
   const location = useLocation();
@@ -60,6 +61,7 @@ function App() {
           />
           <Route path="/courses" element={<Catalogue />} />
           <Route path="/courses/:id" element={<CourseDetails />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route
             path="/lessons/:id"
             element={

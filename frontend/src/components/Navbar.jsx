@@ -26,6 +26,9 @@ export default function Navbar() {
         <Link to="/" className={navLinkClass}>
           Courses
         </Link>
+        <Link to="/faq" className={navLinkClass}>
+          FAQ
+        </Link>
         {user ? (
           <>
             <Link to="/dashboard" className={navLinkClass}>
@@ -87,6 +90,9 @@ export default function Navbar() {
           >
             <Link to="/" className={navLinkClass} onClick={closeMenu}>
               Courses
+            </Link>
+            <Link to="/faq" className={navLinkClass} onClick={closeMenu}>
+              FAQ
             </Link>
             {user ? (
               <>
