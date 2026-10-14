@@ -180,4 +180,4 @@ Environment variables are set directly in each platform's dashboard rather than 
 
 ## License
 
-This project was built as a personal capstone project and does not currently carry an open-source license.
+This project was built as a capstone project by Group 41 and does not currently carry an open-source license.
